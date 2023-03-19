@@ -1,0 +1,23 @@
+{
+  "name": "@gravystack/common",
+  "version": "1.0.0",
+  "description": "Common Layers for Lambdas",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest && exit 1"
+  },
+  "keywords": [],
+  "author": "Davis Sylvester <Davis@sylvesterllc.com>",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.137.0",
+    "@aws-sdk/lib-dynamodb": "^3.145.0",
+    "@aws-sdk/util-dynamodb": "^3.137.0",
+    "@gravystack/layer-common": "1.0.9",
+    "luxon": "^3.0.4",
+    "uuidv4": "^6.2.13"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.111"
+  }
+}
