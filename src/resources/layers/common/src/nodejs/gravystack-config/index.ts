@@ -1,1 +1,0 @@
-export * as gsCommonLayer from "@davissylvester/bishop-layer-common";
