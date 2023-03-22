@@ -8,15 +8,15 @@ export const createUserPoolProps = (securityUserPool: string) => {
         userPoolName: securityUserPool.toLowerCase(),
         selfSignUpEnabled: true,
         userVerification: {
-            emailSubject: 'Verify your email for Gravystack!',
-            emailBody: 'Thanks for creating an account with Gravystack! Your verification code is {####}',
+            emailSubject: 'Verify your email for Bishop CDK Constructs!',
+            emailBody: 'Thanks for creating an account with Bishop CDK Constructs! Your verification code is {####}',
             emailStyle: VerificationEmailStyle.CODE,
-            smsMessage: 'Thanks for signing up {username} with GravyStack! Your verification code is {####}',
+            smsMessage: 'Thanks for signing up {username} with Bishop CDK Constructs! Your verification code is {####}',
         },
         userInvitation: {
-            emailSubject: 'Invite to join GravyStack!',
-            emailBody: 'Hello {username}, you have been invited to join GravyStack! Your temporary password is {####}',
-            smsMessage: 'Your temporary password for {username} with GravyStack is {####}'
+            emailSubject: 'Invite to join Bishop CDK Constructs!',
+            emailBody: 'Hello {username}, you have been invited to join Bishop CDK Constructs! Your temporary password is {####}',
+            smsMessage: 'Your temporary password for {username} with Bishop CDK Constructs is {####}'
         },
         signInAliases: {
             username: true,

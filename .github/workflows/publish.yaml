@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '18.x'
           registry-url: 'https://npm.pkg.github.com/'
-          scope: '@gravystack'
+          scope: '@sylvesterllc'
       - run: npm i -g pnpm
       - run: pnpm i
       - run: git config user.email "davis@sylvesterllc.com"

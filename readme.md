@@ -1,8 +1,8 @@
-# GravyStack CDK Construct Library
+# Bishop CDK Construct Library
 
-## Gravystack Constructs <a name="Constructs" id="Constructs"></a>
+## Bishop Constructs <a name="Constructs" id="Constructs"></a>
 
-Gravystack Constructs is a construct library for creating new AWS Infrastructure in a standardize
+Bishop Constructs is a construct library for creating new AWS Infrastructure in a standardize
 reusable manner. 
 
 ### Available Constructors
@@ -15,8 +15,8 @@ And more...
 
 1. Install the npm package:
 
-    `npm install @gravystack/gs-cdk-constructs --save`
-    - *ensure you have a `.npmrc` that uses the @gravystack npm registry*
+    `npm install @davissylvester/bishop-cdk-constructs --save`
+    - *ensure you have a `.npmrc` that uses the @sylvesterllc npm registry*
 
 
 
@@ -35,7 +35,7 @@ The Microservice construct provides and easy way to get started with a basic Mic
 
 ### Usage
 ```typescript
-import { MicroService, MicroserviceProps } from '@gravystack/gs-cdk-constructs';
+import { MicroService, MicroserviceProps } from '@davissylvester/bishop-cdk-constructs';
 
 new MicroService(this, 'microservice-test', microServiceProps);
 ```
@@ -47,9 +47,7 @@ new MicroService(this, 'microservice-test', microServiceProps);
       GLOBALS: {
           name: `sample-test-app`,
           environments: "dev",
-          stackRuntime: Runtime.NODEJS_18_X,
-          accountNumber: "",
-          region: ""
+          stackRuntime: Runtime.NODEJS_18_X,          
       },
       API: {
           Name: `sample-test-app`,
@@ -133,13 +131,13 @@ When using this library it is a good practice to start with a new CDK project
    - `mkdir my-new-project`
    - `cd my-new-project`
    - `cdk init app --language typescript`
-   - `npm i @gravystack/gs-cdk-constructs`
+   - `npm i @davissylvester/bishop-cdk-constructs`
    - `mkdir lambda-functions` (*holds all your lambda code*)
 
-# [Demo Project](https://github.com/GravyStack/gs-cdk-constructs-demo.git)
+# [Demo Project](https://github.com/davissylvester/bishop-cdk-constructs-demo.git)
 
 - Clone the repository
-  - `git clone https://github.com/GravyStack/gs-cdk-constructs-demo.git`
+  - `git clone https://github.com/davissylvester/bishop-cdk-constructs-demo.git`
   - `npm i`
   - `cdk bootstrap`
   - `cdk deploy`

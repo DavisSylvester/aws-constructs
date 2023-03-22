@@ -16,7 +16,7 @@ export const CONSTANTS = {
         },
     },
     WEB: {
-        ADMIN_PORTAL_BUCKET: 'agent-dashboard.gravystack.net',
+        ADMIN_PORTAL_BUCKET: 'bishop.davissylvester.net',
     },
     AUTH:{
         OAUTH: {

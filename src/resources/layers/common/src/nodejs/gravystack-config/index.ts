@@ -1,1 +1,1 @@
-export * as gsCommonLayer from "@gravystack/layer-common";
+export * as gsCommonLayer from "@davissylvester/bishop-layer-common";

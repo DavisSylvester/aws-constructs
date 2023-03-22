@@ -67,7 +67,7 @@ export class CreateMicroServiceBundle {
         }
 
         if (this.secretMgr) {
-            this.AssignAccessToGravyStackSecretManager(this.secretMgr, lambdas.Lambdas);
+            this.AssignAccessToSecretManager(this.secretMgr, lambdas.Lambdas);
         }        
 
         lambdas.Lambdas.map((lambda) => {
@@ -173,7 +173,7 @@ export class CreateMicroServiceBundle {
         });
     }
 
-    private AssignAccessToGravyStackSecretManager(secret: ISecret, lambdas: NodejsFunction[]) {
+    private AssignAccessToSecretManager(secret: ISecret, lambdas: NodejsFunction[]) {
 
         lambdas.forEach((lambda) => {
             const result = secret.grantRead(lambda);

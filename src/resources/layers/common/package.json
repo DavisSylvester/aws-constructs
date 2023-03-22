@@ -1,5 +1,5 @@
 {
-  "name": "@gravystack/common",
+  "name": "@davissylvester/bishop-common",
   "version": "1.0.0",
   "description": "Common Layers for Lambdas",
   "main": "index.js",
@@ -12,8 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.137.0",
     "@aws-sdk/lib-dynamodb": "^3.145.0",
-    "@aws-sdk/util-dynamodb": "^3.137.0",
-    "@gravystack/layer-common": "1.0.9",
+    "@aws-sdk/util-dynamodb": "^3.137.0",   
     "luxon": "^3.0.4",
     "uuidv4": "^6.2.13"
   },

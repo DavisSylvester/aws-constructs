@@ -34,7 +34,7 @@ export class MicroService extends Construct {
         let tables: Table[] | undefined = undefined;
 
         if (!process.env.SECRET_MANAGER_ARN) {
-            throw new Error(`You must provide the ARN for the GravyStack's Configuration Secret 
+            throw new Error(`You must provide the ARN for the your Configuration Secret 
                 Manager`);            
         }
 

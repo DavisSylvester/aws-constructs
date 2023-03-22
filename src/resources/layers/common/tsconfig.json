@@ -1,7 +1,7 @@
 {
   "extends": "../../../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist/nodejs/node_modules/@gravystack/common",
+    "outDir": "./dist/nodejs/node_modules/@davissylvester/bishop-common",
     "skipLibCheck": true
   }
 }

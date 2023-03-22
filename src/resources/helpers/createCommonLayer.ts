@@ -6,9 +6,9 @@ import { AppConfig } from "../../config/AppConfig";
 export const createCommonLayer = (scope: Construct, appProps: AppConfig) => {
 
     const prop: TsgLambdaLayerProp = {
-        description: 'Gravystack Common layer',
-        codePath: './node_modules/@gravystack/gs-cdk-constructs/dist',
-        name: 'gravystack-common-layer'
+        description: 'Common Lambda layer',
+        codePath: './node_modules/@davissylvester/bishop-cdk-constructs/dist',
+        name: 'bishop-common-layer'
     };  
     
     const layer = createLambdaLayer(scope, appProps, prop)
