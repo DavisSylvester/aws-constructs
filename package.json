@@ -1,5 +1,5 @@
 {
-  "name": "@davissylvester/aws-constructs",
+  "name": "@sylvesterllc/aws-constructs",
   "version": "1.0.0",
   "description": "AWS Constructs",
   "main": "index.js",
