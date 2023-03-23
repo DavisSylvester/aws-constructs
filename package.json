@@ -2,7 +2,11 @@
   "name": "@sylvesterllc/aws-constructs",
   "version": "1.0.0",
   "description": "AWS Constructs",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "keywords": [
+    "CDK",
+    "Constructs"
+  ],  
   "scripts": {
     "build": "npm run clean && tsc",
     "build:layers": "cd ./src/resources/layers/common && pnpm i && tsc",
