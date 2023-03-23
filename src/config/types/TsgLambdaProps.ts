@@ -11,7 +11,6 @@ export interface TsgLambdaProps {
 
     scope: Construct;
     prop: MicroserviceProps;
-    bundle: TsgBundleProp;
     appConfig: AppConfig;
     role?: IRole;
     poolArn?: IUserPool;

@@ -53,7 +53,7 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
-        props.RESOURCES.BUNDLE?.forEach((bundleProps: TsgBundleProp) => {
+        props.RESOURCES.Lambdas.forEach((bundleProps: TsgBundleProp) => {
             //console.log("INSIDE BUNDLE FOREACH: Creating bundle: " + bundleProps.version);
             this.bundleByVersion[bundleProps.version] = new CreateMicroServiceBundle(scope, 
                 gateway[0], props, bundleProps, this.appConfig, tables, secretMgr, layers);
