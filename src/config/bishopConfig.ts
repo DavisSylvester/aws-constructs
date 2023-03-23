@@ -15,10 +15,7 @@ export const config: IAppConfig = {
         Description: 'This is my new API',
         DomainPrefix: 'my-custom-api'
     },
-    RESOURCES: {
-        BUNDLE: [
-            {
-                version: "v1",
+    RESOURCES: {        
                 LAMBDA: [
                     {
                         name: `create-account`,
@@ -40,8 +37,7 @@ export const config: IAppConfig = {
                         }
                     },                    
                 ],
-            },
-        ],
+            
         DYNAMO: {
             TABLES: [
                 {
