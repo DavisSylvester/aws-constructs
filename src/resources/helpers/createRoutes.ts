@@ -1,6 +1,6 @@
 import { IRestApi, LambdaIntegration, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { TsgBundleProp, TsgLambdaProp } from "../../config/types";
+import { TsgLambdaProp } from "../../config/types";
 
 
 export class Routes {
@@ -8,8 +8,7 @@ export class Routes {
     public static Resources: Resource[] = [];  
     private static routeMap = new Map();       
 
-    public static createResource(
-        bundle: TsgBundleProp, 
+    public static createResource(        
         prop: TsgLambdaProp, 
         api: IRestApi, 
         lambdaNode: NodejsFunction, 
@@ -21,8 +20,8 @@ export class Routes {
         if (prop.apiGateway?.route) {
 
         //  Note:  this now uses the bundle version as the first segment in the path.
-        let activeRoutePath = `/${bundle.version}`;
-        let activeResource: Resource = Routes.routeMap.get(activeRoutePath) ||  api.root.addResource(bundle.version);
+        let activeRoutePath = `/${(prop.apiGateway.version) ? prop.apiGateway.version : 1 }`;
+        let activeResource: Resource = Routes.routeMap.get(activeRoutePath) ||  api.root.addResource(activeRoutePath);
         Routes.routeMap.set(activeRoutePath, activeResource);
 
         //  Now we go through our route segments creating the rest of the path.

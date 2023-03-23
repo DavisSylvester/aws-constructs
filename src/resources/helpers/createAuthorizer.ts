@@ -6,7 +6,7 @@ import { Construct } from "constructs";
 import * as path from 'path';
 import { AppConfig } from "../../config/AppConfig";
 
-import { TsgBundleProp, TsgLambdaProp } from "../../config/types";
+import { TsgLambdaProp } from "../../config/types";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { BaseResource } from "../base/baseResource";
 import { CreateLambda } from "../lambda/createLambda";
@@ -17,7 +17,7 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
         return this.createdResources[0];
     }
 
-    constructor(scope: Construct, props: AppConfig, protected bundleProps: TsgBundleProp, protected authProps: TsgLambdaProp) {
+    constructor(scope: Construct, props: AppConfig, protected authProps: TsgLambdaProp) {
 
         super(scope, props);
 
@@ -38,7 +38,7 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
 
         const authorizerProps = this.createLambdaFunctionProps(lambdaConfig!);
 
-        const lambdaId = CreateLambda.getIdForLambda(this.bundleProps, lambdaConfig);
+        const lambdaId = CreateLambda.getIdForLambda(lambdaConfig);
         const lambda = new NodejsFunction(scope, lambdaId, authorizerProps);
 
         lambda.grantInvoke(new ServicePrincipal('apigateway.amazonaws.com'));

@@ -1,6 +1,5 @@
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
-import { TsgBundleProp } from "../config/types";
 import { MicroserviceProps } from "../interfaces/MicroserviceProps";
 import { CreateMicroServiceBundle } from "../resources/gateway/createMicroServiceBundle";
 import { CreateDynamoDb } from "../resources/dynamodb/CreateDynamo";
@@ -9,6 +8,8 @@ import { getSecretManager } from "../resources/securityManager";
 import { createCommonLayer } from "../resources/helpers/createCommonLayer";
 import { AppConfig } from "../config/AppConfig";
 import { Tags } from "aws-cdk-lib";
+import { TsgLambdaProps } from "../config/types/TsgLambdaProps";
+import { TsgLambdaProp } from "../config/types";
 
 export class MicroService extends Construct {
 
@@ -53,10 +54,10 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
-        props.RESOURCES.Lambdas.forEach((bundleProps: TsgBundleProp) => {
-            //console.log("INSIDE BUNDLE FOREACH: Creating bundle: " + bundleProps.version);
-            this.bundleByVersion[bundleProps.version] = new CreateMicroServiceBundle(scope, 
-                gateway[0], props, bundleProps, this.appConfig, tables, secretMgr, layers);
+        props.RESOURCES.LAMBDA.forEach((bundleProps: TsgLambdaProp) => {
+            
+            new CreateMicroServiceBundle(scope, 
+                gateway[0], props, this.appConfig, tables, secretMgr, layers);
         });
     }
 

@@ -3,7 +3,7 @@ import { ITable, Table } from "aws-cdk-lib/aws-dynamodb";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import { TsgDynamoTableRef, TsgLambdaProp, TsgBundleProp } from "../../config/types";
+import { TsgDynamoTableRef, TsgLambdaProp } from "../../config/types";
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { CreateAuthorizer } from "../helpers/createAuthorizer";
@@ -23,8 +23,7 @@ export class CreateMicroServiceBundle {
 
     constructor(scope: Construct, 
         private readonly gatewayApi: IRestApi, 
-        private readonly props: MicroserviceProps, 
-        private readonly bundleProp: TsgBundleProp,
+        private readonly props: MicroserviceProps,
         private readonly appConfig: AppConfig,
         private readonly tables?: Table[], 
         private readonly secretMgr?: ISecret, 
@@ -32,7 +31,7 @@ export class CreateMicroServiceBundle {
         ) {
         
         this.requireDynamoTableRefs = (props.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
-        this.requireAuthorizer = (bundleProp.AUTHORIZER) ? true : false;
+        this.requireAuthorizer = (props.RESOURCES.AUTHORIZER) ? true : false;
         this.onInit(scope);
     }
 
@@ -43,14 +42,13 @@ export class CreateMicroServiceBundle {
 
         // Create Authorizer
         if (this.requireAuthorizer) {
-            authorizer = new CreateAuthorizer(scope, this.appConfig, this.bundleProp, this.bundleProp.AUTHORIZER!).JwtAuthorizer;   
+            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;   
         }        
 
         // Create Lambdas
         const lambdaProp: TsgLambdaProps = {
             scope,
-            prop: this.props,
-            bundle: this.bundleProp,
+            prop: this.props,            
             layers: this.layers,
             appConfig: this.appConfig
         };
@@ -159,16 +157,16 @@ export class CreateMicroServiceBundle {
         lambdas: NodejsFunction[], 
         authorizer?: TokenAuthorizer) {
 
-        this.bundleProp.LAMBDA?.forEach((prop: TsgLambdaProp) => {
+        this.appConfig.lambdaConfigs?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(this.bundleProp, prop);
+            const lambdaId = CreateLambda.getIdForLambda(prop);
             const lambdaNode = lambdas.find(x => x.node.id === lambdaId);
 
             if (!lambdaNode) {
                 throw new Error("Can't find the Lambda Integration");                
             }
 
-            Routes.createResource(this.bundleProp, prop, gateway, lambdaNode, authorizer);
+            Routes.createResource(prop, gateway, lambdaNode, authorizer);
         
         });
     }

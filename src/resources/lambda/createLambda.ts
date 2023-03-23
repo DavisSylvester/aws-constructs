@@ -7,7 +7,7 @@ import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/
 import { Construct } from "constructs";
 import * as path from 'path';
 import { AppConfig } from "../../config/AppConfig";
-import { TsgBundleProp, TsgLambdaProp } from "../../config/types";
+import { TsgLambdaProp } from "../../config/types";
 
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunctionInput";
@@ -58,12 +58,12 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
 
         //console.log("ENTER createLambdaFunctions");
-        const createdLambdas = this.props.bundle.LAMBDA.map((config:TsgLambdaProp) => {
+        const createdLambdas = this.props.prop.RESOURCES.LAMBDA.map((config:TsgLambdaProp) => {
 
             //console.log("ENTER createLambdaFunctions.map for " + config.name);
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
-            const lambdaId = CreateLambda.getIdForLambda(this.props.bundle, config);
+            const lambdaId = CreateLambda.getIdForLambda(config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
             //  If we have managed policies, we add them.
@@ -178,7 +178,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    public static getIdForLambda(bundleProp: TsgBundleProp, lambdaProp: TsgLambdaProp) {
-        return `${lambdaProp.name}-${bundleProp.version}-fctn`.toLowerCase();
+    public static getIdForLambda(lambdaProp: TsgLambdaProp) {       
+        return `${lambdaProp.name}`.toLowerCase();
     }
 }
