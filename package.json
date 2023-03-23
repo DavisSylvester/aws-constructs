@@ -4,7 +4,15 @@
   "description": "AWS Constructs",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "build": "npm run clean && tsc",
+    "build:layers": "cd ./src/resources/layers/common && pnpm i && tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk",
+    "clean": "rm -rf dist",
+    "clean:layers": "rm -rf ./src/resources/layers/common/dist",
+    "publish:lib": "npm run build && npm publish",
+    "preinstall": "npx only-allow pnpm"
   },
   "repository": {
     "type": "git",
