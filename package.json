@@ -18,6 +18,9 @@
     "type": "git",
     "url": "git+https://github.com/DavisSylvester/aws-constructs.git"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "author": "Davis Sylvester <davis@sylvesterllc.com>",
   "license": "ISC",
   "bugs": {
