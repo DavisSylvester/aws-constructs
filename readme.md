@@ -5,6 +5,8 @@
 Bishop Constructs is a construct library for creating new AWS Infrastructure in a standardize
 reusable manner. 
 
+[![Publish package to GitHub Packages](https://github.com/DavisSylvester/aws-constructs/actions/workflows/publish.yaml/badge.svg?branch=main)](https://github.com/DavisSylvester/aws-constructs/actions/workflows/publish.yaml)
+
 ### Available Constructors
 
  - [Microservice](#microservice-construct)

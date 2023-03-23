@@ -5,7 +5,7 @@ import { IAppConfig } from "./customConfigs/IAppConfig";
 
 export const config: IAppConfig = {
     GLOBALS: {
-        name: `${process.env.APP_NAME}`,        
+        name: `${process.env.APP_NAME}`,
         accountNumber: process.env.CDK_DEFAULT_ACCOUNT || "",
         region: process.env.CDK_DEFAULT_REGION || "us-east-1",
         stackRuntime: Runtime.NODEJS_18_X,
@@ -16,32 +16,30 @@ export const config: IAppConfig = {
         DomainPrefix: 'my-custom-api'
     },
     RESOURCES: {
-        BUNDLE: [
+        LAMBDA: [
             {
-                version: "v1",
-                LAMBDA: [
-                    {
-                        name: `create-account`,
-                        codePath: './lambda-functions/auth/createAccount.ts',
-                        handler: 'main',                                                
-                        apiGateway: {
-                            route: '/account/create-account',
-                            method: 'post',
-                        },
-                        
-                    },
-                    {
-                        name: `change-password`,
-                        codePath: './lambda-functions/auth/changePassword.ts',
-                        handler: 'main',                                               
-                        apiGateway: {
-                            route: '/account/change-password',
-                            method: 'post', 
-                        }
-                    },                    
-                ],
+                name: `create-account`,
+                codePath: './lambda-functions/auth/createAccount.ts',
+                handler: 'main',
+                apiGateway: {
+                    route: '/account/create-account',
+                    method: 'post',                    
+                },
+
+            },
+            {
+                name: `change-password`,
+                codePath: './lambda-functions/auth/changePassword.ts',
+                handler: 'main',
+                apiGateway: {
+                    route: '/account/change-password',
+                    method: 'post',
+                    version: 2
+                }
             },
         ],
+
+
         DYNAMO: {
             TABLES: [
                 {
@@ -69,19 +67,19 @@ export const config: IAppConfig = {
                             projectionType: ProjectionType.ALL
                         },
                     ]
-                },            
-        ],
+                },
+            ],
         },
-    
+
     },
     DNS: {
-       ZoneName:  '',
-       ZoneId: '',
-       ZoneNameWithoutPeriod: 'not-used',
-       ZoneNameWithoutSuffix: 'not-used',
-       ZoneExist: true,
-       HostName: '',
-       FQDN: ''
-        
+        ZoneName: '',
+        ZoneId: '',
+        ZoneNameWithoutPeriod: 'not-used',
+        ZoneNameWithoutSuffix: 'not-used',
+        ZoneExist: true,
+        HostName: '',
+        FQDN: ''
+
     }
 }; 
