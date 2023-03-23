@@ -23,6 +23,7 @@ jobs:
       - run: git config user.email "davis@sylvesterllc.com"
       - run: git config user.name "Davis Sylvester III"
       - run: cp .npmrc src/resources/layers/common
+      - run: npm login dsylvester3
       - run: npm set //npm.pkg.github.com/:_authToken ${{ secrets.NPM_REGISTRY_TOKEN }}
       # - run: npm config set '//npm.pkg.github.com/:_authToken' ${{ secrets.CICD_TOKEN }}
       # - run: npm run build:layers      
