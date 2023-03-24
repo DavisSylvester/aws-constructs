@@ -9,7 +9,7 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { CreateAuthorizer } from "../helpers/createAuthorizer";
 import { Routes } from "../helpers/createRoutes";
 import { CreateLambda } from "../lambda/createLambda";
-import { Duration, Stack } from "aws-cdk-lib";
+import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { CreateDynamoDb } from "../dynamodb/CreateDynamo";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
@@ -44,6 +44,7 @@ export class CreateMicroServiceBundle {
         if (this.requireAuthorizer) {
             authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
             authorizer._attachToApi(this.gatewayApi);   
+            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
         }        
 
         // Create Lambdas
