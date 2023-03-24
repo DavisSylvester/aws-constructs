@@ -41,11 +41,11 @@ export class MicroService extends Construct {
 
         const secretMgr = getSecretManager(scope, props, process.env.SECRET_MANAGER_ARN);
 
-        const commonLayer = createCommonLayer(scope, props);
+        // const commonLayer = createCommonLayer(scope, props);
 
         const gateway = new Api(scope, this.appConfig).APIs;
 
-        const layers = [commonLayer];
+        const layers = undefined; // [commonLayer];
 
         // Creates DynamoDb Tables if required
         if (this.requireDynamoTables) {
