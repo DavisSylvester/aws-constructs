@@ -1,4 +1,4 @@
-import { CfnOutput, Tag } from "aws-cdk-lib";
+import { CfnOutput, RemovalPolicy, Tag } from "aws-cdk-lib";
 import { BasePathMapping, Cors, CorsOptions, DomainName, EndpointType, IDomainName, IRestApi, MethodOptions, RestApi, RestApiProps, SecurityPolicy } from "aws-cdk-lib/aws-apigateway";
 import { ARecord, HostedZone, IHostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
 import { ApiGateway, ApiGatewayDomain } from "aws-cdk-lib/aws-route53-targets";
@@ -104,12 +104,14 @@ export class Api extends BaseResource<IRestApi> {
     }
 
     private createARecord(scope: Construct, zone: IHostedZone, api: RestApi) {
-        return new ARecord(scope, "ApiRecord", {
+        const aRecord =  new ARecord(scope, "ApiRecord", {
             zone,
             target: RecordTarget.fromAlias(new ApiGateway(api)),
             recordName: this.config.API.DomainPrefix
         });
             
+        aRecord.applyRemovalPolicy(RemovalPolicy.DESTROY);
+        return aRecord;
     }    
 
     protected createResource(scope: Construct) {        

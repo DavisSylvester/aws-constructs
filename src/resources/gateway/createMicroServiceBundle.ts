@@ -160,6 +160,10 @@ export class CreateMicroServiceBundle {
         this.appConfig.lambdaConfigs?.forEach((prop: TsgLambdaProp) => {
 
             const lambdaId = CreateLambda.getIdForLambda(prop);
+
+            if (!lambdaId) {
+                throw new Error(`Can't find lambda`);
+            }
             const lambdaNode = lambdas.find(x => x.node.id === lambdaId);
 
             if (!lambdaNode) {
