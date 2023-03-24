@@ -13,8 +13,7 @@ import { TsgLambdaProp } from "../config/types";
 
 export class MicroService extends Construct {
 
-    protected readonly requireDynamoTables: boolean;
-    protected bundleByVersion: Record<string, CreateMicroServiceBundle> = {};
+    protected readonly requireDynamoTables: boolean;  
     protected appConfig: AppConfig;
 
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
@@ -54,11 +53,11 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
-        props.RESOURCES.LAMBDA.forEach((bundleProps: TsgLambdaProp) => {
+        // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
             
-            new CreateMicroServiceBundle(scope, 
+        const result = new CreateMicroServiceBundle(scope, 
                 gateway[0], props, this.appConfig, tables, secretMgr, layers);
-        });
+        // });
     }
 
     protected createTag(scope: Construct) {

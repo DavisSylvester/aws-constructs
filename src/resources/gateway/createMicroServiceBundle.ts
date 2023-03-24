@@ -23,11 +23,11 @@ export class CreateMicroServiceBundle {
 
     constructor(scope: Construct, 
         private readonly gatewayApi: IRestApi, 
-        private readonly props: MicroserviceProps,
+        private readonly props: MicroserviceProps,        
         private readonly appConfig: AppConfig,
         private readonly tables?: Table[], 
         private readonly secretMgr?: ISecret, 
-        private readonly layers?: LayerVersion[],
+        private readonly layers?: LayerVersion[],        
         ) {
         
         this.requireDynamoTableRefs = (props.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
@@ -37,7 +37,7 @@ export class CreateMicroServiceBundle {
 
     private onInit(scope: Construct) {
 
-        //console.log("ENTER CreateMicroServiceBundle.onInit");
+        
         let authorizer: TokenAuthorizer|undefined = undefined;
 
         // Create Authorizer
