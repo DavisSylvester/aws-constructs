@@ -38,7 +38,7 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
 
         const authorizerProps = this.createLambdaFunctionProps(lambdaConfig!);
 
-        const lambdaId = CreateLambda.getIdForLambda(lambdaConfig);
+        const lambdaId = CreateLambda.getIdForLambda(lambdaConfig, this.config);
         const lambda = new NodejsFunction(scope, lambdaId, authorizerProps);
 
         lambda.grantInvoke(new ServicePrincipal('apigateway.amazonaws.com'));

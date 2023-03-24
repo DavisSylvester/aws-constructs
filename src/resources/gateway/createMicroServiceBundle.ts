@@ -160,7 +160,7 @@ export class CreateMicroServiceBundle {
 
         this.appConfig.lambdaConfigs?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(prop);
+            const lambdaId = CreateLambda.getIdForLambda(prop, this.appConfig);
 
             if (!lambdaId) {
                 throw new Error(`Can't find lambda`);
@@ -180,7 +180,7 @@ export class CreateMicroServiceBundle {
 
         lambdas.forEach((lambda) => {
             const result = secret.grantRead(lambda);
-            console.log('Assigning Access to Secret Manager: ',result);
+            
         });
         
     }
