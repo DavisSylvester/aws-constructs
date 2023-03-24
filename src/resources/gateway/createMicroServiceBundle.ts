@@ -42,7 +42,8 @@ export class CreateMicroServiceBundle {
 
         // Create Authorizer
         if (this.requireAuthorizer) {
-            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;   
+            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
+            authorizer._attachToApi(this.gatewayApi);   
         }        
 
         // Create Lambdas
