@@ -64,6 +64,11 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             const lambdaId = CreateLambda.getIdForLambda(config, this.config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
+            if (lambdaId === fctn.node.id) {
+                console.log(`found Lambda for : ${fctn.node.id}`);
+            }
+
+            
             //  If we have managed policies, we add them.
             if (config.managedPolicies && config.managedPolicies?.length > 0) {
                 
@@ -106,11 +111,11 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 minify: false,
                 target: 'es2020',
                 sourceMap: true,
-                sourceMapMode: SourceMapMode.INLINE,
+                sourceMapMode: SourceMapMode.EXTERNAL,
                 environment: prop.environment || prop.environment,
             },
             role,
-            layers
+            //layers
 
         }
 

@@ -70,13 +70,13 @@ export class CreateMicroServiceBundle {
             this.AssignAccessToSecretManager(this.secretMgr, lambdas.Lambdas);
         }        
 
-        lambdas.Lambdas.map((lambda) => {
-            lambda.metricErrors({                
-                    label: `${lambda.functionName}-errors`, 
-                    period: Duration.minutes(3)           
+        // lambdas.Lambdas.map((lambda) => {
+        //     lambda.metricErrors({                
+        //             label: `${lambda.functionName}-errors`, 
+        //             period: Duration.minutes(3)           
                 
-            })
-        });
+        //     })
+        // });
 
         this.AddRoutes(this.props, this.gatewayApi, lambdas.Lambdas, authorizer);
     }
@@ -159,7 +159,7 @@ export class CreateMicroServiceBundle {
         lambdas: NodejsFunction[], 
         authorizer?: TokenAuthorizer) {
 
-        this.appConfig.lambdaConfigs?.forEach((prop: TsgLambdaProp) => {
+        props.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
             const lambdaId = CreateLambda.getIdForLambda(prop, this.appConfig);
 

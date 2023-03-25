@@ -58,6 +58,8 @@ export class MicroService extends Construct {
         const result = new CreateMicroServiceBundle(scope, 
                 gateway[0], props, this.appConfig, tables, secretMgr, layers);
         // });
+
+        
     }
 
     protected createTag(scope: Construct) {
