@@ -1,5 +1,5 @@
 import { CfnOutput, Duration } from "aws-cdk-lib";
-import { IdentitySource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
+import { IdentitySource, TokenAuthorizer, TokenAuthorizerProps } from "aws-cdk-lib/aws-apigateway";
 import { ManagedPolicy, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
@@ -38,7 +38,7 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
 
         const authorizerProps = this.createLambdaFunctionProps(lambdaConfig!);
 
-        const lambdaId = CreateLambda.getIdForLambda(lambdaConfig);
+        const lambdaId = CreateLambda.getIdForLambda(lambdaConfig, this.config);
         const lambda = new NodejsFunction(scope, lambdaId, authorizerProps);
 
         lambda.grantInvoke(new ServicePrincipal('apigateway.amazonaws.com'));
@@ -47,13 +47,15 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
             this.assignManagedPolicies(lambda, lambdaConfig.managedPolicies);
         }
 
-        const lambdaAuthorizer = new TokenAuthorizer(scope, `${lambdaConfig.name}-authorizer`, {
+        const props: TokenAuthorizerProps = {
             handler: lambda,
             authorizerName: lambdaConfig.name,
             resultsCacheTtl: Duration.seconds(0), 
             identitySource: IdentitySource.header('Authorization'),
             
-        });
+        };
+
+        const lambdaAuthorizer = new TokenAuthorizer(scope, `${lambdaConfig.name}-authorizer`, props);
 
         return lambdaAuthorizer;
     }

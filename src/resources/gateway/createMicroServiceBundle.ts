@@ -9,7 +9,7 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { CreateAuthorizer } from "../helpers/createAuthorizer";
 import { Routes } from "../helpers/createRoutes";
 import { CreateLambda } from "../lambda/createLambda";
-import { Duration, Stack } from "aws-cdk-lib";
+import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
 import { CreateDynamoDb } from "../dynamodb/CreateDynamo";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
@@ -42,7 +42,9 @@ export class CreateMicroServiceBundle {
 
         // Create Authorizer
         if (this.requireAuthorizer) {
-            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;   
+            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
+            authorizer._attachToApi(this.gatewayApi);   
+            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
         }        
 
         // Create Lambdas
@@ -159,7 +161,11 @@ export class CreateMicroServiceBundle {
 
         this.appConfig.lambdaConfigs?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(prop);
+            const lambdaId = CreateLambda.getIdForLambda(prop, this.appConfig);
+
+            if (!lambdaId) {
+                throw new Error(`Can't find lambda`);
+            }
             const lambdaNode = lambdas.find(x => x.node.id === lambdaId);
 
             if (!lambdaNode) {
@@ -175,7 +181,7 @@ export class CreateMicroServiceBundle {
 
         lambdas.forEach((lambda) => {
             const result = secret.grantRead(lambda);
-            console.log('Assigning Access to Secret Manager: ',result);
+            
         });
         
     }
