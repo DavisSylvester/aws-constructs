@@ -56,11 +56,9 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     }
 
     private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
-
-        //console.log("ENTER createLambdaFunctions");
+        
         const createdLambdas = this.props.prop.RESOURCES.LAMBDA.map((config:TsgLambdaProp) => {
-
-            //console.log("ENTER createLambdaFunctions.map for " + config.name);
+            
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
             const lambdaId = CreateLambda.getIdForLambda(config, this.config);

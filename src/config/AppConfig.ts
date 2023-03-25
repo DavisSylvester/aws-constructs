@@ -81,8 +81,7 @@ export class AppConfig implements IAppConfig {
     }
 
     private expandProps<T, R>(data: Record<string, R>) {
-
-        console.log('data', data);
+        
         const result = [];
         // @ts-ignore
         for (const [key, value] of Object.entries(data)) {
