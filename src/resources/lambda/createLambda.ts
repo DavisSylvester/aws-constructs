@@ -63,7 +63,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             //console.log("ENTER createLambdaFunctions.map for " + config.name);
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
-            const lambdaId = CreateLambda.getIdForLambda(config);
+            const lambdaId = CreateLambda.getIdForLambda(config, this.config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
             //  If we have managed policies, we add them.
@@ -90,6 +90,8 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
     private createLambdaFunctionProps(props: CreateLambdaFunctionInput) {
         const { prop, role, layers } = props;
+
+        console.log(`function Name: ${this.props.appConfig.AppPrefix}-${prop.name}`);
 
         const lambdaProp: NodejsFunctionProps = {
             entry: path.join(prop.codePath),
@@ -178,7 +180,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    public static getIdForLambda(lambdaProp: TsgLambdaProp) {       
-        return `${lambdaProp.name}`.toLowerCase();
+    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {       
+        return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
     }
 }
