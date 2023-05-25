@@ -106,9 +106,6 @@ export class CreateDynamoDb extends BaseResource<Table> {
     }
 
     private generateDbName(tableName: string) {
-        // TODO:  Remove this later  table names should have appPrefix
-        return `${tableName}`;
-        
-        // return `${this.config.AppPrefix}-${tableName}`;
+        return `${this.config.AppPrefix}-${tableName}`;
     }
 }

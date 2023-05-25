@@ -62,9 +62,9 @@ export class CreateMicroServiceBundle {
         }        
 
         // Allow access to existing tables
-        if (this.requireDynamoTableRefs) {
-            this.AssignAccessToTableRefs(scope, this.props.RESOURCES.DYNAMO?.TABLE_REFS, lambdas.Lambdas);
-        }
+        // if (this.requireDynamoTableRefs) {
+        //     this.AssignAccessToTableRefs(scope, this.props.RESOURCES.DYNAMO?.TABLE_REFS, lambdas.Lambdas);
+        // }
 
         if (this.secretMgr) {
             this.AssignAccessToSecretManager(this.secretMgr, lambdas.Lambdas);
@@ -84,26 +84,29 @@ export class CreateMicroServiceBundle {
     private AssignAccessToTables(tables: Table[], lambdas: NodejsFunction[]) {
 
         if (tables) {
-            tables.forEach((table: ITable) => {
+            lambdas.forEach((lambda: NodejsFunction) => {
+            
+                tables.forEach((table: ITable) => {
 
-                lambdas.forEach((lambda: NodejsFunction) => {
+                
 
                     //  This is a CDK bug: It doesn't provide
                     //  access to the indexes.
                     //table.grantReadWriteData(lambda);
 
                     //  Workaround:
-                    lambda.addToRolePolicy(
-                        new PolicyStatement({
-                            effect: Effect.ALLOW,
-                            actions: CreateDynamoDb.ReadWriteActions,
-                            resources: [
-                                table.tableArn,
-                                `${table.tableArn}/*`, // This is not recognized by cdk, but table is.  why?
-                            ],
-                        })
-                    );
+                    // lambda.addToRolePolicy(
+                    //     new PolicyStatement({
+                    //         effect: Effect.ALLOW,
+                    //         actions: CreateDynamoDb.ReadWriteActions,
+                    //         resources: [
+                    //             table.tableArn,
+                    //             `${table.tableArn}/*`, // This is not recognized by cdk, but table is.  why?
+                    //         ],
+                    //     })
+                    // );
 
+                    table.grantReadWriteData(lambda);
                     
                     
                 });
