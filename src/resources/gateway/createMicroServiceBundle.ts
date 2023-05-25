@@ -26,7 +26,7 @@ export class CreateMicroServiceBundle {
         private readonly props: MicroserviceProps,        
         private readonly appConfig: AppConfig,
         private readonly tables?: Table[], 
-        private readonly secretMgr?: ISecret, 
+        private readonly secretMgr?: ISecret | null, 
         private readonly layers?: LayerVersion[],        
         ) {
         

@@ -33,12 +33,14 @@ export class MicroService extends Construct {
 
         let tables: Table[] | undefined = undefined;
 
-        if (!process.env.SECRET_MANAGER_ARN) {
-            throw new Error(`You must provide the ARN for the your Configuration Secret 
-                Manager`);            
+
+        if (process.env.SECRET_MANAGER_ARN) {
+            // throw new Error(`You must provide the ARN for the your Configuration Secret 
+            //     Manager`);      
+             const secretMgr = getSecretManager(scope, props, process.env.SECRET_MANAGER_ARN);            
         }
 
-        const secretMgr = getSecretManager(scope, props, process.env.SECRET_MANAGER_ARN);
+       
 
         // const commonLayer = createCommonLayer(scope, props);
 
@@ -56,7 +58,7 @@ export class MicroService extends Construct {
         // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
             
         const result = new CreateMicroServiceBundle(scope, 
-                gateway[0], props, this.appConfig, tables, secretMgr, layers);
+                gateway[0], props, this.appConfig, tables, null, layers);
         // });
 
         
