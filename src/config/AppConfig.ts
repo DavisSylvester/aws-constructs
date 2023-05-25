@@ -13,7 +13,7 @@ export class AppConfig implements IAppConfig {
     public API: ApiAppConfig;
     public GLOBALS: GlobalAppConfig;
     public RESOURCES: ResourceAppConfig;
-    public DNS: TsgDnsAppConfig;
+    public DNS?: TsgDnsAppConfig;
 
 
     public lambdaConfigs: TsgLambdaProp[];
@@ -62,7 +62,7 @@ export class AppConfig implements IAppConfig {
         };
 
         this.DNS = {
-            ...config.DNS
+            ...config.DNS!
         };
     }
     //     this.lambdaConfigs = this.expandProps<TsgLambdaName, TsgLambdaProp>(this.RESOURCES.LAMBDA!);
