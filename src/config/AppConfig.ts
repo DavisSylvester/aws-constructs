@@ -61,9 +61,11 @@ export class AppConfig implements IAppConfig {
             ...config.RESOURCES.DYNAMO
         };
 
-        this.DNS = {
-            ...config.DNS!
-        };
+        if (config.DNS) {
+            this.DNS = {
+                ...config.DNS!
+            };
+        }
     }
     //     this.lambdaConfigs = this.expandProps<TsgLambdaName, TsgLambdaProp>(this.RESOURCES.LAMBDA!);
     //     this.dynamoConfigs = this.expandProps<TsgTableName, TsgDynamoProp>(this.RESOURCES.DYNAMO?.TABLES!);
@@ -81,7 +83,7 @@ export class AppConfig implements IAppConfig {
     }
 
     private expandProps<T, R>(data: Record<string, R>) {
-        
+
         const result = [];
         // @ts-ignore
         for (const [key, value] of Object.entries(data)) {

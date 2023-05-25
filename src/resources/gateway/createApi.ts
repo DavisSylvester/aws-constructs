@@ -28,6 +28,9 @@ export class Api extends BaseResource<IRestApi> {
 
     private createApi(scope: Construct) {
         if (this.config.DNS) {
+            
+            console.log('### DNS is true ###');
+
             const zone = this.getZone(this.scope, this.config);
 
             const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone));

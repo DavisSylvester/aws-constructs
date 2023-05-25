@@ -8,9 +8,6 @@ import { getSecretManager } from "../resources/securityManager";
 import { createCommonLayer } from "../resources/helpers/createCommonLayer";
 import { AppConfig } from "../config/AppConfig";
 import { Tags } from "aws-cdk-lib";
-import { TsgLambdaProps } from "../config/types/TsgLambdaProps";
-import { TsgLambdaProp } from "../config/types";
-
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;  
