@@ -7,5 +7,5 @@ export interface MicroserviceProps {
     API: ApiAppConfig;
     GLOBALS: GlobalAppConfig;
     RESOURCES: ResourceAppConfig;
-    DNS: TsgDnsAppConfig;
+    DNS?: TsgDnsAppConfig;
 }

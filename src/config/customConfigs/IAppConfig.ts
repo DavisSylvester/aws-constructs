@@ -9,5 +9,5 @@ export interface IAppConfig {
     GLOBALS: GlobalAppConfig;
     API?: ApiAppConfig;
     RESOURCES: ResourceAppConfig;
-    DNS: TsgDnsAppConfig;
+    DNS?: TsgDnsAppConfig;
 }

@@ -1,5 +1,5 @@
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
-import { GlobalSecondaryIndexProps,Table, TableProps } from "aws-cdk-lib/aws-dynamodb";
+import { GlobalSecondaryIndexProps,StreamViewType,Table, TableProps } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import { AppConfig } from "../../config/AppConfig";
 import { BaseResource } from "../base/baseResource";
@@ -43,8 +43,11 @@ export class CreateDynamoDb extends BaseResource<Table> {
             const tables = props?.map((prop: any, idx: number) => {
                 const dbTable = new Table(scope, `${prop.tableName}`, {
                     ...prop,
-                    removalPolicy: RemovalPolicy.DESTROY
+                    removalPolicy: RemovalPolicy.DESTROY,
+                    
                 });
+
+                
 
                 this.config.RESOURCES.DYNAMO?.TABLES?.[idx].indexes.map((gsi) => {
 

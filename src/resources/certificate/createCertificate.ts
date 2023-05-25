@@ -27,11 +27,11 @@ export class CreateCertificate {
 
           const appType = "spa-app";
 
-          const cert = new Certificate(scope, `${props.DNS.ZoneNameWithoutPeriod}-${appType}-certificate`, {
-            domainName: `${props.API.DomainPrefix}.${props.DNS.ZoneName}`,
-            subjectAlternativeNames: [`${props.API.DomainPrefix}.${props.DNS.ZoneName}`],
+          const cert = new Certificate(scope, `${props.DNS?.ZoneNameWithoutPeriod}-${appType}-certificate`, {
+            domainName: `${props.API.DomainPrefix}.${props.DNS?.ZoneName}`,
+            subjectAlternativeNames: [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`],
             validation: CertificateValidation.fromDnsMultiZone({                
-                    [`${props.API.DomainPrefix}.${props.DNS.ZoneName}`] : hostedZone ,                
+                    [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`] : hostedZone ,                
             }),
           });
 
