@@ -1,5 +1,5 @@
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
-import { GlobalSecondaryIndexProps,StreamViewType,Table, TableProps } from "aws-cdk-lib/aws-dynamodb";
+import { GlobalSecondaryIndexProps,Table, TableProps } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import { AppConfig } from "../../config/AppConfig";
 import { BaseResource } from "../base/baseResource";
