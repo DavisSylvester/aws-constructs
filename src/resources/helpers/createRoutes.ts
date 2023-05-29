@@ -22,10 +22,16 @@ export class Routes {
         //  Only attach lambda to an Api Gateway if a route exist
         if (prop.apiGateway?.route) {
             
+            console.log('ROute: ', prop.apiGateway.route);
+
+            //  First we create the root resource if it doesn't exist.
                 //  Note:  this now uses the bundle version as the first segment in the path.
                 activeRoutePath = (prop.apiGateway.useRouteOverride)? "/" : `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1}`;
                 activeResource = Routes.routeMap.get(activeRoutePath) || api.root.addResource(activeRoutePath);
                 Routes.routeMap.set(activeRoutePath, activeResource);
+
+                console.log('Routes.routeMap: ', Routes.routeMap);
+                console.log('activeResource: ', activeResource);
             
             //  Now we go through our route segments creating the rest of the path.
             const pathSegments = prop.apiGateway?.route.split("/").filter(x => (x));
