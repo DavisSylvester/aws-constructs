@@ -20,7 +20,7 @@ export class Routes {
         if (prop.apiGateway?.route) {
 
         //  Note:  this now uses the bundle version as the first segment in the path.
-        let activeRoutePath = `${!prop.apiGateway.useVersioning ? `/` : `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1 }`}`;
+        let activeRoutePath = (prop.apiGateway.useVersioning) ? `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1 }` : "/";
         let activeResource: Resource = Routes.routeMap.get(activeRoutePath) ||  api.root.addResource(activeRoutePath);
         Routes.routeMap.set(activeRoutePath, activeResource);
 
