@@ -38,7 +38,7 @@ export class Routes {
 
             for (let i = 0; i < pathSegments.length; i++) {
                 activeRoutePath = `${activeRoutePath}/${pathSegments[i]}`;
-                let secondaryResource = Routes.routeMap.get(activeRoutePath) || activeResource?.addResource(pathSegments[i]) || api.root.addResource(activeRoutePath);
+                let secondaryResource = Routes.routeMap.get(activeRoutePath) || activeResource?.addResource(pathSegments[i]) || api.root.addResource(pathSegments[i]);
                 Routes.routeMap.set(activeRoutePath, secondaryResource);
                 activeResource = secondaryResource;
             }
