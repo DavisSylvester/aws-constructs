@@ -3,5 +3,5 @@ export interface TsgLambdaRoutable {
     secure?: boolean;
     method?: "get" | "post" | "delete" | "put" | "patch";
     version?: number;
-    useVersioning?: boolean;
+    useRouteOverride?: boolean;
 }
