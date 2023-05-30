@@ -1,4 +1,4 @@
-import { IRestApi, LambdaIntegration, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
+import { AuthorizationType, IRestApi, LambdaIntegration, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
 
@@ -21,18 +21,18 @@ export class Routes {
 
         //  Only attach lambda to an Api Gateway if a route exist
         if (prop.apiGateway?.route) {
-            
+
             console.log('ROute: ', prop.apiGateway.route);
 
-            if (!prop.apiGateway.useRouteOverride)  {
-            //  First we create the root resource if it doesn't exist.
+            if (!prop.apiGateway.useRouteOverride) {
+                //  First we create the root resource if it doesn't exist.
                 //  Note:  this now uses the bundle version as the first segment in the path.
-                activeRoutePath =  `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1}`;
+                activeRoutePath = `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1}`;
                 activeResource = Routes.routeMap.get(activeRoutePath) || api.root.addResource(activeRoutePath);
                 Routes.routeMap.set(activeRoutePath, activeResource);
             }
-    
-            
+
+
             //  Now we go through our route segments creating the rest of the path.
             const pathSegments = prop.apiGateway?.route.split("/").filter(x => (x));
 
@@ -46,8 +46,28 @@ export class Routes {
             //  Finally, we attach our function to the last resource
             activeResource!.addMethod(prop.apiGateway.method || 'GET',
                 new LambdaIntegration(lambdaNode, { proxy: true, }),
-                prop.apiGateway.secure ? { authorizer } : undefined);
+                {
+                    requestParameters: Routes.createQueryStringObject(prop.apiGateway.queryStrings),
+                    apiKeyRequired: (prop.apiGateway.requireApiKey) ? true : false,
+                    authorizer: prop.apiGateway.secure ? authorizer : undefined,
+                    authorizationType: prop.apiGateway.secure ? AuthorizationType.CUSTOM : undefined,
+                });
         }
+    }
+
+    public static createQueryStringObject(queryStrings: string[] | undefined): { [key: string]: boolean }  {
+
+        if (!queryStrings || queryStrings.length === 0) {
+            return {};
+        }
+
+        const obj: { [key: string]: boolean } = {};
+
+        queryStrings.forEach((qs: string) => {
+            obj[`method.request.querystring[${qs}`] = true;
+          });
+
+          return obj;   
     }
 
 }

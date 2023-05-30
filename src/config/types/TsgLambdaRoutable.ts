@@ -4,4 +4,6 @@ export interface TsgLambdaRoutable {
     method?: "get" | "post" | "delete" | "put" | "patch";
     version?: number;
     useRouteOverride?: boolean;
+    requireApiKey?: boolean;
+    queryStrings?: string[];
 }
