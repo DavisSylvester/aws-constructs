@@ -64,7 +64,7 @@ export class Routes {
         const obj: { [key: string]: boolean } = {};
 
         queryStrings.forEach((qs: string) => {
-            obj[`method.request.querystring[${qs}`] = true;
+            obj[`method.request.querystring.${qs}`] = true;
           });
 
           return obj;   
