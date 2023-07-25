@@ -59,8 +59,14 @@ export class MicroService extends Construct {
 
         // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
             
-        const result = new CreateMicroServiceBundle(scope, 
-                gateway[0], props, this.appConfig, tables, null, layers);
+        const result = new CreateMicroServiceBundle({
+            scope, 
+            gatewayApi: gateway[0], 
+            props, 
+            appConfig: this.appConfig, 
+            tables, 
+            secretMgr: undefined, 
+            layers});
         // });
 
         

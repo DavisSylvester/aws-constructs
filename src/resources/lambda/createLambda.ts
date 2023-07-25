@@ -115,7 +115,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 environment: prop.environment || prop.environment,
             },
             role,
-            //layers
+            layers
 
         }
 

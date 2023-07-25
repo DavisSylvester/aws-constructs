@@ -9,30 +9,22 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { CreateAuthorizer } from "../helpers/createAuthorizer";
 import { Routes } from "../helpers/createRoutes";
 import { CreateLambda } from "../lambda/createLambda";
-import { Duration, RemovalPolicy, Stack } from "aws-cdk-lib";
+import { RemovalPolicy, Stack } from "aws-cdk-lib";
 import { CreateDynamoDb } from "../dynamodb/CreateDynamo";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
-import { AppConfig } from "../../config/AppConfig";
-import { MetricOptions } from "aws-cdk-lib/aws-cloudwatch";
+
+import { ServiceBundleConfig } from "../../config/ServiceBundleConfig";
 
 export class CreateMicroServiceBundle {
     
     protected readonly requireDynamoTableRefs: boolean;
     protected readonly requireAuthorizer: boolean;
 
-    constructor(scope: Construct, 
-        private readonly gatewayApi: IRestApi, 
-        private readonly props: MicroserviceProps,        
-        private readonly appConfig: AppConfig,
-        private readonly tables?: Table[], 
-        private readonly secretMgr?: ISecret | null, 
-        private readonly layers?: LayerVersion[],        
-        ) {
+    constructor(private serviceBundleConfig: ServiceBundleConfig) {
         
-        this.requireDynamoTableRefs = (props.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
-        this.requireAuthorizer = (props.RESOURCES.AUTHORIZER) ? true : false;
-        this.onInit(scope);
+        this.requireDynamoTableRefs = (this.serviceBundleConfig.props.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
+        this.requireAuthorizer = (this.serviceBundleConfig.props.RESOURCES.AUTHORIZER) ? true : false;
+        this.onInit(this.serviceBundleConfig.scope);
     }
 
     private onInit(scope: Construct) {
@@ -42,23 +34,23 @@ export class CreateMicroServiceBundle {
 
         // Create Authorizer
         if (this.requireAuthorizer) {
-            authorizer = new CreateAuthorizer(scope, this.appConfig, this.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
-            authorizer._attachToApi(this.gatewayApi);   
+            authorizer = new CreateAuthorizer(scope, this.serviceBundleConfig.appConfig, this.serviceBundleConfig.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
+            authorizer._attachToApi(this.serviceBundleConfig.gatewayApi);   
             authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
         }        
 
         // Create Lambdas
         const lambdaProp: TsgLambdaProps = {
             scope,
-            prop: this.props,            
-            layers: this.layers,
-            appConfig: this.appConfig
+            prop: this.serviceBundleConfig.props,            
+            layers: this.serviceBundleConfig.layers,
+            appConfig: this.serviceBundleConfig.appConfig
         };
 
-        const lambdas = new CreateLambda(lambdaProp, this.appConfig);
+        const lambdas = new CreateLambda(lambdaProp, this.serviceBundleConfig.appConfig);
 
-        if (this.tables) {
-            this.AssignAccessToTables(this.tables, lambdas.Lambdas);
+        if (this.serviceBundleConfig.tables) {
+            this.AssignAccessToTables(this.serviceBundleConfig.tables, lambdas.Lambdas);
         }        
 
         // Allow access to existing tables
@@ -66,8 +58,8 @@ export class CreateMicroServiceBundle {
         //     this.AssignAccessToTableRefs(scope, this.props.RESOURCES.DYNAMO?.TABLE_REFS, lambdas.Lambdas);
         // }
 
-        if (this.secretMgr) {
-            this.AssignAccessToSecretManager(this.secretMgr, lambdas.Lambdas);
+        if (this.serviceBundleConfig.secretMgr) {
+            this.AssignAccessToSecretManager(this.serviceBundleConfig.secretMgr, lambdas.Lambdas);
         }        
 
         // lambdas.Lambdas.map((lambda) => {
@@ -78,7 +70,7 @@ export class CreateMicroServiceBundle {
         //     })
         // });
 
-        this.AddRoutes(this.props, this.gatewayApi, lambdas.Lambdas, authorizer);
+        this.AddRoutes(this.serviceBundleConfig.props, this.serviceBundleConfig.gatewayApi, lambdas.Lambdas, authorizer);
     }
 
     private AssignAccessToTables(tables: Table[], lambdas: NodejsFunction[]) {
@@ -164,7 +156,7 @@ export class CreateMicroServiceBundle {
 
         props.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(prop, this.appConfig);
+            const lambdaId = CreateLambda.getIdForLambda(prop, this.serviceBundleConfig.appConfig);
 
             if (!lambdaId) {
                 throw new Error(`Can't find lambda`);
