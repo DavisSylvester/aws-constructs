@@ -6,9 +6,9 @@ import { AppConfig } from "../../config/AppConfig";
 export const createCommonLayer = (scope: Construct, appProps: AppConfig) => {
 
     const prop: TsgLambdaLayerProp = {
-        description: 'Common Lambda layer',
-        codePath: './node_modules/@davissylvester/bishop-cdk-constructs/dist',
-        name: 'bishop-common-layer'
+        description: appProps.RESOURCES.LAMBDA_LAYERS![0].description,
+        codePath: appProps.RESOURCES.LAMBDA_LAYERS![0].codePath,
+        name: appProps.RESOURCES.LAMBDA_LAYERS![0].name,
     };  
     
     const layer = createLambdaLayer(scope, appProps, prop)
