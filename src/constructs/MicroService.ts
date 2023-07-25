@@ -8,9 +8,11 @@ import { getSecretManager } from "../resources/securityManager";
 import { createCommonLayer } from "../resources/helpers/createCommonLayer";
 import { AppConfig } from "../config/AppConfig";
 import { Tags } from "aws-cdk-lib";
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 export class MicroService extends Construct {
 
-    protected readonly requireDynamoTables: boolean;  
+    protected readonly requireDynamoTables: boolean;
+    protected readonly hasLambdaLayers: boolean;  
     protected appConfig: AppConfig;
 
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
@@ -21,6 +23,9 @@ export class MicroService extends Construct {
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
 
+        this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS && 
+            props.RESOURCES.LAMBDA_LAYERS.length > 0);
+
         this.onInit(scope, this.appConfig);
 
         this.createTag(scope)
@@ -29,7 +34,7 @@ export class MicroService extends Construct {
     private onInit(scope: Construct, props: AppConfig) {
 
         let tables: Table[] | undefined = undefined;
-
+        let commonLayers: LayerVersion[] | undefined = undefined;
 
         if (process.env.SECRET_MANAGER_ARN) {
             // throw new Error(`You must provide the ARN for the your Configuration Secret 
@@ -37,13 +42,13 @@ export class MicroService extends Construct {
              const secretMgr = getSecretManager(scope, props, process.env.SECRET_MANAGER_ARN);            
         }
 
-       
-
-        // const commonLayer = createCommonLayer(scope, props);
+        if (this.hasLambdaLayers) {
+            commonLayers = createCommonLayer(scope, props);
+        }
 
         const gateway = new Api(scope, this.appConfig).APIs;
 
-        const layers = undefined; // [commonLayer];
+        const layers = commonLayer;
 
         // Creates DynamoDb Tables if required
         if (this.requireDynamoTables) {

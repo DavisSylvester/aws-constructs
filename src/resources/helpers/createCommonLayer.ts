@@ -13,6 +13,6 @@ export const createCommonLayer = (scope: Construct, appProps: AppConfig) => {
     
     const layer = createLambdaLayer(scope, appProps, prop)
     
-    return layer;
+    return [layer];
 };
 
