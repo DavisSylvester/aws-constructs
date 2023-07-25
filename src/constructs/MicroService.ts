@@ -24,7 +24,7 @@ export class MicroService extends Construct {
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
 
         this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS && 
-            props.RESOURCES.LAMBDA_LAYERS.length > 0);
+            props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
 
         this.onInit(scope, this.appConfig);
 
