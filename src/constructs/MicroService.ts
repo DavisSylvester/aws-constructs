@@ -12,7 +12,7 @@ import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
-    protected readonly hasLambdaLayers: boolean;  
+    protected readonly hasLambdaLayers: boolean = false;  
     protected appConfig: AppConfig;
 
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
