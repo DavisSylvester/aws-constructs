@@ -48,7 +48,7 @@ export class MicroService extends Construct {
 
         const gateway = new Api(scope, this.appConfig).APIs;
 
-        const layers = commonLayer;
+        const layers = commonLayers;
 
         // Creates DynamoDb Tables if required
         if (this.requireDynamoTables) {
