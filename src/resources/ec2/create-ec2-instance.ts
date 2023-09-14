@@ -22,7 +22,7 @@ export class Ec2Instance extends BaseResource<Instance> {
 
         const server = new Instance(scope, `my-ec2`, {
             vpc: Vpc.fromLookup(scope, 'VPC', {
-                vpcId: '',
+                vpcId: 'vpc-018ca34f04796fc03',
                 isDefault: true
             }),
             instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.SMALL),
