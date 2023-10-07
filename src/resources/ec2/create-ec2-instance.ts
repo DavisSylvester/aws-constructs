@@ -17,12 +17,13 @@ export class Ec2Instance extends BaseResource<Instance> {
     protected createResource(scope: Construct): Instance[] | null {
 
         const keyPair = new CfnKeyPair(scope, 'my-key-pair', {
-            keyName: 'davis-aws-key-pair',
+            keyName: 'davis-dsylv-amazon-com',
+            publicKeyMaterial: process.env.KEY_PAIR
         });
 
         const server = new Instance(scope, `my-ec2`, {
             vpc: Vpc.fromLookup(scope, 'VPC', {
-                vpcId: 'vpc-018ca34f04796fc03',
+                vpcId: 'vpc-e210a398',
                 isDefault: true
             }),
             instanceType: InstanceType.of(InstanceClass.T3, InstanceSize.SMALL),

@@ -12,6 +12,7 @@ import { TsgLambdaProp } from "../../config/types";
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunctionInput";
 import { BaseResource } from "../base/baseResource";
+import { LogRetention, RetentionDays } from "aws-cdk-lib/aws-logs";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
@@ -100,6 +101,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             entry: path.join(prop.codePath),
             functionName: `${this.props.appConfig.AppPrefix}-${prop.name}`,
             handler: prop.handler,
+            logRetention: RetentionDays.FIVE_DAYS,
             runtime: prop.runtime || this.config.GLOBALS.stackRuntime,
             timeout: prop.duration || Duration.minutes(2),
             memorySize: prop.memory || 512,
