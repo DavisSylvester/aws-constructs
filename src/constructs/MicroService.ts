@@ -19,7 +19,7 @@ export class MicroService extends Construct {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
-
+        
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
 

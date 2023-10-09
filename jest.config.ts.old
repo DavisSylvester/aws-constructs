@@ -1,0 +1,20 @@
+import type { Config } from '@jest/types';
+
+const config: Config.InitialOptions = {
+  testEnvironment: 'node',
+  verbose: true,
+  testMatch: ['**/*.test.ts'],
+  moduleFileExtensions: ['ts', 'tsx', 'json', 'js'],
+  transform: {
+    '^.+\\.tsx?$': 'ts-jest',
+  },
+  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
+  preset: 'ts-jest/presets/js-with-ts',
+  coverageDirectory: 'coverage',
+  roots: ['<rootDir>/__tests__'],
+  setupFiles: [],
+  setupFilesAfterEnv: [],
+  coverageReporters: ['json', 'lcov', 'text', 'clover'],
+};
+
+export default config;
