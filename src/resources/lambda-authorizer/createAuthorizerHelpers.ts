@@ -1,13 +1,13 @@
 import { Duration } from "aws-cdk-lib";
 import { IdentitySource, RequestAuthorizer } from "aws-cdk-lib/aws-apigateway";
-import { IFunction, Runtime } from "aws-cdk-lib/aws-lambda";
+import { IFunction, LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { Construct } from "constructs";
 import { AppConfig } from "../../config/AppConfig";
 import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/aws-lambda-nodejs";
 import path = require("path");
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 
-export const createAuthorizer = (scope: Construct, config: AppConfig) => {
+export const createAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[]) => {
 
     const lambda = createLambdaForAuthorizer(scope, config);
 
@@ -25,9 +25,9 @@ export const createAuthorizer = (scope: Construct, config: AppConfig) => {
     return lambdaAuthroizer;
 };
 
-const createLambdaForAuthorizer = (scope: Construct, config: AppConfig) => {
+const createLambdaForAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[]) => {
 
-    const props = createLambdaProps(config);
+    const props = createLambdaProps(config, layers);
 
     const lambda = new NodejsFunction(
         scope,
@@ -38,7 +38,7 @@ const createLambdaForAuthorizer = (scope: Construct, config: AppConfig) => {
     return lambda;
  };
 
-const createLambdaProps = (appConfig: AppConfig) => {
+const createLambdaProps = (appConfig: AppConfig, layers?: LayerVersion[]) => {
 
 
     const prop = appConfig.RESOURCES.AUTHORIZER!;
@@ -62,7 +62,7 @@ const createLambdaProps = (appConfig: AppConfig) => {
             sourceMapMode: SourceMapMode.EXTERNAL,
             environment: prop.environment || prop.environment,
         },
-        layers: [prop.layers]
+        layers
     }
 
     return lambdaProp;

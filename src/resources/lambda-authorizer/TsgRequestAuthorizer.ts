@@ -5,6 +5,7 @@ import { BaseResource } from "../base/baseResource";
 
 import { CfnOutput } from "aws-cdk-lib";
 import { createAuthorizer } from "./createAuthorizerHelpers";
+import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 
 
 export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
@@ -13,12 +14,12 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
         return this.createdResources[0];
     }
 
-    constructor(scope: Construct, config: AppConfig) {
+    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
         super(scope, config);
     }
 
     protected createResource(scope: Construct): RequestAuthorizer[] | null {
-        const authorizer = createAuthorizer(scope, this.config);
+        const authorizer = createAuthorizer(scope, this.config, this.layers);
         return [authorizer];
     }
 
