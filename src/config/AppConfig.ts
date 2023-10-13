@@ -29,6 +29,7 @@ export class AppConfig implements IAppConfig {
 
     constructor(config: IAppConfig) {
         this.populate(config);
+        console.log('config', config);
     }
 
     private populate(config: IAppConfig) {
