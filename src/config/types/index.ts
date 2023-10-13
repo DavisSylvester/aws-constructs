@@ -7,3 +7,5 @@ export * from "./TsgDynamoProp";
 export * from "./TsgDynamoTableRef";
 export * from "./TsgDynamoDbProp";
 export * from "./LogDuration";
+export * from "./TsgAuthorizerProp";
+export * from "./TsgCdkConfigType";
