@@ -7,14 +7,9 @@ import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/
 import path = require("path");
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 
-const createReuqestAuhorizer = (scope: Construct, config: AppConfig) => {
+export const createAuthorizer = (scope: Construct, config: AppConfig) => {
 
-
-
-
-};
-
-const createAuthorizer = (scope: Construct, lambda: IFunction, config: AppConfig) => {
+    const lambda = createLambdaForAuthorizer(scope, config);
 
     const lambdaAuthroizer = new RequestAuthorizer(
         scope,
@@ -39,6 +34,8 @@ const createLambdaForAuthorizer = (scope: Construct, config: AppConfig) => {
         `${config.AppPrefix}-authorizer`,
         props
     );
+
+    return lambda;
  };
 
 const createLambdaProps = (appConfig: AppConfig) => {

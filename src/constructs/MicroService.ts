@@ -59,6 +59,8 @@ export class MicroService extends Construct {
 
         // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
             
+        // TODO::  REFACTOR AWAY FROM THE SERVICE BUNDLE
+        // CREATE API GATEWAY AND LAMBDA HERE 
         const result = new CreateMicroServiceBundle({
             scope, 
             gatewayApi: gateway[0], 

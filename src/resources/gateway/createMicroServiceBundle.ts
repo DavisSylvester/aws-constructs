@@ -1,27 +1,27 @@
+import { RemovalPolicy, Stack } from "aws-cdk-lib";
 import { IRestApi, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { ITable, Table } from "aws-cdk-lib/aws-dynamodb";
-import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Effect, PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { Construct } from "constructs";
 import { TsgDynamoTableRef, TsgLambdaProp } from "../../config/types";
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
-import { CreateAuthorizer } from "../helpers/createAuthorizer";
-import { Routes } from "../helpers/createRoutes";
-import { CreateLambda } from "../lambda/createLambda";
-import { RemovalPolicy, Stack } from "aws-cdk-lib";
 import { CreateDynamoDb } from "../dynamodb/CreateDynamo";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { Routes } from "../helpers/createRoutes";
+import { CreateAuthorizer } from "../lambda-authorizer/TsgJwtTokenAuthorizer";
+import { CreateLambda } from "../lambda/createLambda";
 
 import { ServiceBundleConfig } from "../../config/ServiceBundleConfig";
 
 export class CreateMicroServiceBundle {
-    
+
     protected readonly requireDynamoTableRefs: boolean;
     protected readonly requireAuthorizer: boolean;
 
     constructor(private serviceBundleConfig: ServiceBundleConfig) {
-        
+
         this.requireDynamoTableRefs = (this.serviceBundleConfig.props.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
         this.requireAuthorizer = (this.serviceBundleConfig.props.RESOURCES.AUTHORIZER) ? true : false;
         this.onInit(this.serviceBundleConfig.scope);
@@ -29,20 +29,21 @@ export class CreateMicroServiceBundle {
 
     private onInit(scope: Construct) {
 
-        
-        let authorizer: TokenAuthorizer|undefined = undefined;
+
+        let authorizer: TokenAuthorizer | undefined = undefined;
 
         // Create Authorizer
         if (this.requireAuthorizer) {
+           
             authorizer = new CreateAuthorizer(scope, this.serviceBundleConfig.appConfig, this.serviceBundleConfig.props.RESOURCES.AUTHORIZER!).JwtAuthorizer;
-            authorizer._attachToApi(this.serviceBundleConfig.gatewayApi);   
+            authorizer._attachToApi(this.serviceBundleConfig.gatewayApi);
             authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
-        }        
+        }
 
         // Create Lambdas
         const lambdaProp: TsgLambdaProps = {
             scope,
-            prop: this.serviceBundleConfig.props,            
+            prop: this.serviceBundleConfig.props,
             layers: this.serviceBundleConfig.layers,
             appConfig: this.serviceBundleConfig.appConfig
         };
@@ -51,7 +52,7 @@ export class CreateMicroServiceBundle {
 
         if (this.serviceBundleConfig.tables) {
             this.AssignAccessToTables(this.serviceBundleConfig.tables, lambdas.Lambdas);
-        }        
+        }
 
         // Allow access to existing tables
         // if (this.requireDynamoTableRefs) {
@@ -60,13 +61,13 @@ export class CreateMicroServiceBundle {
 
         if (this.serviceBundleConfig.secretMgr) {
             this.AssignAccessToSecretManager(this.serviceBundleConfig.secretMgr, lambdas.Lambdas);
-        }        
+        }
 
         // lambdas.Lambdas.map((lambda) => {
         //     lambda.metricErrors({                
         //             label: `${lambda.functionName}-errors`, 
         //             period: Duration.minutes(3)           
-                
+
         //     })
         // });
 
@@ -77,10 +78,10 @@ export class CreateMicroServiceBundle {
 
         if (tables) {
             lambdas.forEach((lambda: NodejsFunction) => {
-            
+
                 tables.forEach((table: ITable) => {
 
-                
+
 
                     //  This is a CDK bug: It doesn't provide
                     //  access to the indexes.
@@ -99,8 +100,8 @@ export class CreateMicroServiceBundle {
                     // );
 
                     table.grantReadWriteData(lambda);
-                    
-                    
+
+
                 });
 
             });
@@ -136,7 +137,7 @@ export class CreateMicroServiceBundle {
             });
 
             lambda.role?.addToPrincipalPolicy(statement);
-            
+
         });
     }
 
@@ -145,13 +146,13 @@ export class CreateMicroServiceBundle {
 
         lambdas.forEach((lambda: NodejsFunction) => {
             table.grantReadWriteData(lambda)
-            
+
         });
     }
 
-    private AddRoutes(props: MicroserviceProps, 
-        gateway: IRestApi, 
-        lambdas: NodejsFunction[], 
+    private AddRoutes(props: MicroserviceProps,
+        gateway: IRestApi,
+        lambdas: NodejsFunction[],
         authorizer?: TokenAuthorizer) {
 
         props.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
@@ -164,11 +165,11 @@ export class CreateMicroServiceBundle {
             const lambdaNode = lambdas.find(x => x.node.id === lambdaId);
 
             if (!lambdaNode) {
-                throw new Error("Can't find the Lambda Integration");                
+                throw new Error("Can't find the Lambda Integration");
             }
 
             Routes.createResource(prop, gateway, lambdaNode, authorizer);
-        
+
         });
     }
 
@@ -176,9 +177,9 @@ export class CreateMicroServiceBundle {
 
         lambdas.forEach((lambda) => {
             const result = secret.grantRead(lambda);
-            
+
         });
-        
+
     }
 
 }

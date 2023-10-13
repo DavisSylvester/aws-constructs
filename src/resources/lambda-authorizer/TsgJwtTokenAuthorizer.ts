@@ -11,7 +11,7 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { BaseResource } from "../base/baseResource";
 import { CreateLambda } from "../lambda/createLambda";
 
-export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
+export class TsgJwtTokenAuthorizer extends BaseResource<TokenAuthorizer> {
 
     get JwtAuthorizer() {
         return this.createdResources[0];
