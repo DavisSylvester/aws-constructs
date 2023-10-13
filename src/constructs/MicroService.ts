@@ -18,6 +18,8 @@ export class MicroService extends Construct {
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
         super(scope, id);
 
+        console.table(props);
+        
         this.appConfig = new AppConfig(props);
         console.log('this.appConfig', this.appConfig);
         
