@@ -1,4 +1,4 @@
-import { AuthorizationType, IRestApi, LambdaIntegration, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
+import { AuthorizationType, IRestApi, LambdaIntegration, RequestAuthorizer, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
 
@@ -12,7 +12,7 @@ export class Routes {
         prop: TsgLambdaProp,
         api: IRestApi,
         lambdaNode: NodejsFunction,
-        authorizer?: TokenAuthorizer) {
+        authorizer?: TokenAuthorizer|RequestAuthorizer): void {
 
         const routeMap: Map<string, Resource> = new Map();
 
@@ -27,7 +27,7 @@ export class Routes {
             if (!prop.apiGateway.useRouteOverride) {
                 //  First we create the root resource if it doesn't exist.
                 //  Note:  this now uses the bundle version as the first segment in the path.
-                activeRoutePath = `v${(prop.apiGateway.version) ? prop.apiGateway.version : 1}`;
+                activeRoutePath = `v${(prop.apiGateway?.version) ? prop.apiGateway.version : 1}`;
                 activeResource = Routes.routeMap.get(activeRoutePath) || api.root.addResource(activeRoutePath);
                 Routes.routeMap.set(activeRoutePath, activeResource);
             }

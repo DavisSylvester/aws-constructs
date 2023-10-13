@@ -1,7 +1,6 @@
 import { Table } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
 import { MicroserviceProps } from "../interfaces/MicroserviceProps";
-import { CreateMicroServiceBundle } from "../resources/gateway/createMicroServiceBundle";
 import { CreateDynamoDb } from "../resources/dynamodb/CreateDynamo";
 import { Api } from "../resources/gateway/createApi";
 import { getSecretManager } from "../resources/securityManager";
@@ -9,6 +8,7 @@ import { createCommonLayer } from "../resources/helpers/createCommonLayer";
 import { AppConfig } from "../config/AppConfig";
 import { Tags } from "aws-cdk-lib";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { CreateApiAndAttachLambdas } from "../resources/gateway/CreateApiAndAttachLambdas";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
@@ -19,7 +19,7 @@ export class MicroService extends Construct {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
-
+        
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
 
@@ -59,15 +59,12 @@ export class MicroService extends Construct {
 
         // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
             
-        const result = new CreateMicroServiceBundle({
-            scope, 
-            gatewayApi: gateway[0], 
-            props, 
-            appConfig: this.appConfig, 
-            tables, 
-            secretMgr: undefined, 
-            layers});
-        // });
+        // TODO::  REFACTOR AWAY FROM THE SERVICE BUNDLE
+        // CREATE API GATEWAY AND LAMBDA HERE 
+
+        const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
+
+       
 
         
     }
