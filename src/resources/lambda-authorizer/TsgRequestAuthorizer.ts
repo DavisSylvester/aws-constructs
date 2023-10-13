@@ -9,6 +9,10 @@ import { createAuthorizer } from "./createAuthorizerHelpers";
 
 export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
 
+    get RequestAuthorizer() {
+        return this.createdResources[0];
+    }
+
     constructor(scope: Construct, config: AppConfig) {
         super(scope, config);
     }

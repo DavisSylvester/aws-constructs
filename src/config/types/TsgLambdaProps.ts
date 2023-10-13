@@ -9,7 +9,6 @@ import { AppConfig } from "../AppConfig";
 export interface TsgLambdaProps {
 
     scope: Construct;
-    prop: MicroserviceProps;
     appConfig: AppConfig;
     role?: IRole;
     poolArn?: IUserPool;

@@ -17,7 +17,7 @@ export class TsgJwtTokenAuthorizer extends BaseResource<TokenAuthorizer> {
         return this.createdResources[0];
     }
 
-    constructor(scope: Construct, props: AppConfig, protected authProps: TsgLambdaProp) {
+    constructor(scope: Construct, props: AppConfig) {
 
         super(scope, props);
 
@@ -30,7 +30,7 @@ export class TsgJwtTokenAuthorizer extends BaseResource<TokenAuthorizer> {
     }
 
     protected createResource(scope: Construct): TokenAuthorizer[] | null {
-        return [this.createLambdaAuthorizer(scope, this.authProps)];
+        return [this.createLambdaAuthorizer(scope, this.config.RESOURCES.AUTHORIZER!)];
     }
 
     private createLambdaAuthorizer(scope: Construct, lambdaConfig: TsgLambdaProp) {

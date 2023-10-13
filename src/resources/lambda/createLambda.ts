@@ -18,23 +18,25 @@ import { RetentionDays } from "aws-cdk-lib/aws-logs";
 export class CreateLambda extends BaseResource<NodejsFunction> {
 
     public Lambdas: NodejsFunction[] = [];
+    public LambdaRecords: Record<string, NodejsFunction> = {};
 
+    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
+        super(scope, config);
 
-    constructor(private props: TsgLambdaProps, config: AppConfig) {
-        super(props.scope, config);
-
-        const resources = this.createResource(props.scope);
+        const resources = this.createResource(scope);
 
         this.Lambdas = [...resources];
 
         this.createAlarmsForLambdas(this.Lambdas);
 
-        this.createOutput(props.scope, resources);
+        this.LambdaRecords = this.createRecordForLambda(this.Lambdas);
+
+        this.createOutput(scope, resources);
     }
 
     protected createResource(scope: Construct): NodejsFunction[] {
 
-        const result = this.createLambdas(this.props);
+        const result = this.createLambdas(this.config);
 
         return result;
     }
@@ -49,16 +51,16 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    private createLambdas(props: TsgLambdaProps): NodejsFunction[] {
+    private createLambdas(config: AppConfig): NodejsFunction[] {
 
-        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, props.role, props.layers);
+        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers);
 
         return createdLambdas;
     }
 
-    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
+    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {        
 
-        const createdLambdas = this.props.prop.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
+        const createdLambdas = this.config.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
 
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
@@ -67,13 +69,6 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
             if (lambdaId === fctn.node.id) {
                 console.log(`found Lambda for : ${fctn.node.id}`);
-            }
-
-
-            //  If we have managed policies, we add them.
-            if (config.managedPolicies && config.managedPolicies?.length > 0) {
-
-                this.assignManagedPolicies(fctn, config.managedPolicies);
             }
 
             return fctn;
@@ -95,11 +90,11 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     private createLambdaFunctionProps(props: CreateLambdaFunctionInput) {
         const { prop, role, layers } = props;
 
-        console.log(`function Name: ${this.props.appConfig.AppPrefix}-${prop.name}`);
+        console.log(`function Name: ${this.config.AppPrefix}-${prop.name}`);
 
         const lambdaProp: NodejsFunctionProps = {
             entry: path.join(prop.codePath),
-            functionName: `${this.props.appConfig.AppPrefix}-${prop.name}`,
+            functionName: `${this.config.AppPrefix}-${prop.name}`,
             handler: prop.handler,
             logRetention: (!prop.logDuration) ? RetentionDays.FIVE_DAYS : getDayToSaveLogs(prop.logDuration),
             runtime: prop.runtime || this.config.GLOBALS.stackRuntime,
@@ -125,17 +120,6 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         return lambdaProp;
     };
 
-    private assignManagedPolicies(lambda: NodejsFunction, managedPolicyNames: string[]) {
-
-        managedPolicyNames.forEach((managedPolicyName: string) => {
-
-            let policy = ManagedPolicy.fromAwsManagedPolicyName(managedPolicyName);
-
-            lambda.role?.addManagedPolicy(policy);
-        });
-
-    }
-
     private createAlarmsForLambdas(lambdas: NodejsFunction[]) {
 
         lambdas.forEach((lambda, idx) => {
@@ -153,7 +137,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 period: Duration.minutes(3),
             });
 
-            new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-error-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-error-alarm`, {
                 metric: errorMetric,
                 threshold: 5,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
@@ -162,7 +146,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 alarmName: `${this.config.AppPrefix}-${idx}-error-alarm`
             });
 
-            new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-duration-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-duration-alarm`, {
                 metric: durationMetric,
                 threshold: 1,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
@@ -171,7 +155,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 alarmName: `${this.config.AppPrefix}-${idx}-duration-alarm`
             });
 
-            const invocationAlarm = new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-invocation-alarm`, {
+            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-invocation-alarm`, {
                 metric: errorMetric,
                 threshold: 1000,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
@@ -179,14 +163,31 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 alarmDescription: `${this.config.AppPrefix}-${idx} errors over 3 min period`,
                 alarmName: `${this.config.AppPrefix}-${idx}-invocation-Metric-alarm`
             });
-
-            // const alarmAction: IAlarmAction = {};
-            // invocationAlarm.addAlarmAction(alarmAction);
         });
     }
 
     public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {
         return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
+    }
+    
+    private createRecordForLambda(lambdas: NodejsFunction[]) {
+
+        const names = this.config.RESOURCES.LAMBDA.map((lambda) => {
+            return lambda.name;
+        });
+
+        const lambdaNames = [...names] as const;
+
+        type LambdaName = typeof lambdaNames[number];
+    
+
+        const lambdaRecord: Record<LambdaName, NodejsFunction> = {} as Record<LambdaName, NodejsFunction>;
+
+        lambdas.forEach((lambda, idx) => {
+            lambdaRecord[lambdaNames[idx]  as LambdaName] = lambdas[idx];
+        });
+        
+        return lambdaRecord;
     }
 }
 
