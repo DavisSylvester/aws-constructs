@@ -57,16 +57,9 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
-        // props.RESOURCES.LAMBDA.forEach((lambdaProp: TsgLambdaProp) => {
-            
-        // TODO::  REFACTOR AWAY FROM THE SERVICE BUNDLE
         // CREATE API GATEWAY AND LAMBDA HERE 
-
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
 
-       
-
-        
     }
 
     protected createTag(scope: Construct) {
