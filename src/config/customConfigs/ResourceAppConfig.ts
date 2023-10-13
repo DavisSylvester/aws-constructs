@@ -11,6 +11,6 @@ export interface ResourceAppConfig {
     LAMBDA_LAYERS?: TsgLambdaLayerProp[];
     AUTHORIZER?: TsgAuthorizerProp;
     LAMBDA: TsgLambdaProp[];
-    EC2: TsgEC2Prop[];
+    EC2?: TsgEC2Prop[];
     
 }
