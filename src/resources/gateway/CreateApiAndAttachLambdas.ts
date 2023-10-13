@@ -31,6 +31,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
         this.requireDynamoTableRefs = (this.config.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
         this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
+        console.log('this.config.RESOURCES', this.config.RESOURCES);
+        
         if (this.requireAuthorizer) {
             this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
         } else {
