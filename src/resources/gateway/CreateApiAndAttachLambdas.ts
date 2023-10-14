@@ -52,11 +52,14 @@ console.log('this.config', this.config);
 
     private onInit() {
 
-        let authorizer: TokenAuthorizer | RequestAuthorizer | undefined = undefined;
+        let authorizer: TokenAuthorizer | RequestAuthorizer | undefined | null = undefined;
 
         // Create Authorizer
         if (this.requireAuthorizer) {
-            authorizer = this.createAuthorizer()
+            authorizer = this.createAuthorizer();
+            if (!authorizer) {
+                authorizer = undefined;
+            }
         }
 
         // Create Lambdas
@@ -87,7 +90,7 @@ console.log('this.config', this.config);
 
             return authorizer;
 
-        } else {
+        } else if (this.requireAuthorizer && this.authorizer === TsgAuthorizerType.REQUEST_AUTHORIZER) {
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config).RequestAuthorizer as RequestAuthorizer;
 
@@ -96,6 +99,7 @@ console.log('this.config', this.config);
 
             return authorizer;
         }
+        return null;
     }
 
     private assignAccessToTables(tables: ITable[], lambdas: NodejsFunction[]) {
