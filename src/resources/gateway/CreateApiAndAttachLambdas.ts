@@ -57,9 +57,6 @@ console.log('this.config', this.config);
         // Create Authorizer
         if (this.requireAuthorizer) {
             authorizer = this.createAuthorizer();
-            if (!authorizer) {
-                authorizer = undefined;
-            }
         }
 
         // Create Lambdas
@@ -71,7 +68,7 @@ console.log('this.config', this.config);
         }
 
         // Create Routes on API Gateway for Lambdas from config
-        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
+        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer || undefined);
 
         return lambdas.Lambdas;
     }
