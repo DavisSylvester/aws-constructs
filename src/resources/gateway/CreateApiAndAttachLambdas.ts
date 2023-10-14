@@ -34,8 +34,8 @@ console.log('this.config', this.config);
 
         if (this.requireAuthorizer) {
             this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
-        } else {
-            // throw new Error(`You must provide an authorizer type if a Authorizer is required`);
+        } else if (this.config.RESOURCES.AUTHORIZER && !this.config.RESOURCES.AUTHORIZER.type) {
+            throw new Error(`You must provide an authorizer type if a Authorizer is required`);
         }
 
         this.onInit();
