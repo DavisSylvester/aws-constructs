@@ -22,7 +22,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
     protected readonly authorizer?: TsgAuthorizerType;
 
     constructor(scope: Construct,
-        protected readonly config: AppConfig,
+        protected config: AppConfig,
         private readonly gatewayApi: IRestApi,
         private readonly layers?: LayerVersion[],
         private readonly tables?: ITable[]) {

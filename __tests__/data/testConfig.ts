@@ -1,5 +1,5 @@
 import { Runtime } from "aws-cdk-lib/aws-lambda";
-import { MicroserviceProps } from "../../src/index"
+import { MicroserviceProps, TsgAuthorizerType } from "../../src/index"
 import { AttributeType, BillingMode, ProjectionType } from "aws-cdk-lib/aws-dynamodb";
 
 export const testConfig: MicroserviceProps = {
@@ -132,5 +132,16 @@ export const testConfig: MicroserviceProps = {
                 codePath: `./layers/common/dist/nodejs/node_modules/@todo/common`,
             }
         ],
+        AUTHORIZER: {
+            type: TsgAuthorizerType.REQUEST_AUTHORIZER,
+            name: `authorizer-api`,
+            runtime: Runtime.NODEJS_LATEST,
+            codePath: "./resources/functions/authorizer/index.ts",
+            handler: "authorizer",
+            environment: {
+                VERBOSE_LOGGING: "true",
+            },
+            memory: 512,
+        }
     }
 }; 
