@@ -11,7 +11,7 @@ import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
 
     get RequestAuthorizer() {
-        return this.createdResources[0];
+        return (this.createdResources && this.createdResources.length > 0) ? this.createdResources[0] : undefined;
     }
 
     constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
