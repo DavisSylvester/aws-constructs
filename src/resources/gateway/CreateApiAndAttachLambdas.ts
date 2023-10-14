@@ -82,8 +82,8 @@ console.log('this.config', this.config);
             authorizer = new TsgJwtTokenAuthorizer(this.scope,
                 this.config).JwtAuthorizer;
 
-            authorizer._attachToApi(this.gatewayApi);
-            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
+            authorizer?._attachToApi(this.gatewayApi);
+            authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             return authorizer;
 
@@ -91,8 +91,8 @@ console.log('this.config', this.config);
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config).RequestAuthorizer as RequestAuthorizer;
 
-            authorizer._attachToApi(this.gatewayApi);
-            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
+            authorizer?._attachToApi(this.gatewayApi);
+            authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             return authorizer;
         }
