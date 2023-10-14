@@ -19,7 +19,7 @@ export class MicroService extends Construct {
         super(scope, id);
 
         console.table(props);
-        
+
         this.appConfig = new AppConfig(props);
         console.log('this.appConfig', this.appConfig);
         
@@ -29,12 +29,12 @@ export class MicroService extends Construct {
         this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS && 
             props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
 
-        this.onInit(scope, this.appConfig);
+        this.onInit(scope);
 
         this.createTag(scope)
     }
 
-    private onInit(scope: Construct, props: AppConfig) {
+    private onInit(scope: Construct) {
 
         let tables: Table[] | undefined = undefined;
         let commonLayers: LayerVersion[] | undefined = undefined;
@@ -42,11 +42,11 @@ export class MicroService extends Construct {
         if (process.env.SECRET_MANAGER_ARN) {
             // throw new Error(`You must provide the ARN for the your Configuration Secret 
             //     Manager`);      
-             const secretMgr = getSecretManager(scope, props, process.env.SECRET_MANAGER_ARN);            
+             const secretMgr = getSecretManager(scope, this.appConfig, process.env.SECRET_MANAGER_ARN);            
         }
 
         if (this.hasLambdaLayers) {
-            commonLayers = createCommonLayer(scope, props);
+            commonLayers = createCommonLayer(scope, this.appConfig);
         }
 
         const gateway = new Api(scope, this.appConfig).APIs;
@@ -60,9 +60,12 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
+        try{
         // CREATE API GATEWAY AND LAMBDA HERE 
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
-
+        } catch (err) {
+            console.error(err);
+        }
     }
 
     protected createTag(scope: Construct) {

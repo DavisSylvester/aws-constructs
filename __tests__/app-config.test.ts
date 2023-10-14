@@ -8,6 +8,8 @@ let appConfig: AppConfig|null = null;
 beforeAll(() => {
     props = testConfig;
     appConfig = new AppConfig(props);
+
+    console.log('appConfig', appConfig);
 });    
 describe('app Config', () => {
 

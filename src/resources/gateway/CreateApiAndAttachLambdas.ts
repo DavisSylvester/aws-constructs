@@ -17,12 +17,12 @@ import { Routes } from "../helpers/createRoutes";
 
 export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
 
-    protected readonly requireDynamoTableRefs: boolean;
-    protected readonly requireAuthorizer: boolean;
-    protected readonly authorizer?: TsgAuthorizerType;
+    protected requireDynamoTableRefs: boolean;
+    protected requireAuthorizer: boolean;
+    protected authorizer?: TsgAuthorizerType;
 
     constructor(scope: Construct,
-        protected config: AppConfig,
+        config: AppConfig,
         private readonly gatewayApi: IRestApi,
         private readonly layers?: LayerVersion[],
         private readonly tables?: ITable[]) {
@@ -31,8 +31,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
         this.requireDynamoTableRefs = (this.config.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
         this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
-        console.log('this.config.RESOURCES', this.config.RESOURCES);
-        
+        console.log('this.config', this.config);
+
         if (this.requireAuthorizer) {
             this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
         } else {
