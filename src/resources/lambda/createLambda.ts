@@ -13,6 +13,7 @@ import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunctionInput";
 import { BaseResource } from "../base/baseResource";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { LambdaHelper } from "./lambdaHelper";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
@@ -90,13 +91,11 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     private createLambdaFunctionProps(props: CreateLambdaFunctionInput) {
         const { prop, role, layers } = props;
 
-        console.log(`function Name: ${this.config.AppPrefix}-${prop.name}`);
-
         const lambdaProp: NodejsFunctionProps = {
             entry: path.join(prop.codePath),
             functionName: `${this.config.AppPrefix}-${prop.name}`,
             handler: prop.handler,
-            logRetention: (!prop.logDuration) ? RetentionDays.FIVE_DAYS : getDayToSaveLogs(prop.logDuration),
+            logRetention: (!prop.logDuration) ? RetentionDays.FIVE_DAYS : LambdaHelper.getDayToSaveLogs(prop.logDuration),
             runtime: prop.runtime || this.config.GLOBALS.stackRuntime,
             timeout: prop.duration || Duration.minutes(2),
             memorySize: prop.memory || 512,
@@ -115,7 +114,6 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             layers
 
         }
-
 
         return lambdaProp;
     };
@@ -191,27 +189,4 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     }
 }
 
-function getDayToSaveLogs(saveLogDuration: LogDuration): RetentionDays {
 
-    switch (saveLogDuration) {
-        case LogDuration.ONE_DAY:
-            return RetentionDays.ONE_DAY;
-
-        case LogDuration.ONE_WEEK:
-            return RetentionDays.ONE_WEEK;
-
-        case LogDuration.ONE_MONTH:
-            return RetentionDays.ONE_MONTH;
-
-        case LogDuration.ONE_YEAR:
-            return RetentionDays.ONE_YEAR;
-
-        case LogDuration.FIVE_YEARS:
-            return RetentionDays.FIVE_YEARS;
-
-        case LogDuration.FOREVER:
-            return RetentionDays.INFINITE;
-        default:
-            return RetentionDays.FIVE_DAYS;
-    }
-}

@@ -9,9 +9,11 @@ import { AppConfig } from "../config/AppConfig";
 import { Tags } from "aws-cdk-lib";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { CreateApiAndAttachLambdas } from "../resources/gateway/CreateApiAndAttachLambdas";
+import { createSeedDatabaseCustomResource } from "../resources/customResource/createSeedDatabaseCustomResource";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
+    protected readonly requireSeedDatabase: boolean = false;
     protected readonly hasLambdaLayers: boolean = false;  
     protected appConfig: AppConfig;
 
@@ -25,6 +27,9 @@ export class MicroService extends Construct {
         
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
+
+        this.requireSeedDatabase = (props.RESOURCES.DYNAMO?.USE_SEED_DATABASE && 
+            props.RESOURCES.DYNAMO.SEED_LAMBDA) ? true : false;
 
         this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS && 
             props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
@@ -60,12 +65,13 @@ export class MicroService extends Construct {
             tables = dynamo.CreatedTables;
         }
 
-        try{
+        if (this.requireSeedDatabase) {
+            createSeedDatabaseCustomResource(scope, this.appConfig, tables![0], layers);
+        }
+        
         // CREATE API GATEWAY AND LAMBDA HERE 
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
-        } catch (err) {
-            console.error(err);
-        }
+       
     }
 
     protected createTag(scope: Construct) {
