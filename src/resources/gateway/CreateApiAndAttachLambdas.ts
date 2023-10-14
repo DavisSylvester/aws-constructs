@@ -23,13 +23,16 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
 
     constructor(scope: Construct,
         config: AppConfig,
-        private readonly gatewayApi: IRestApi,
-        private readonly layers?: LayerVersion[],
-        private readonly tables?: ITable[]) {
+        private gatewayApi: IRestApi,
+        private layers?: LayerVersion[],
+        private tables?: ITable[]) {
         super(scope, config);
 
-        this.requireDynamoTableRefs = (this.config.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? true : false;
-        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && this.config.RESOURCES.AUTHORIZER.type) ? true : false;
+        this.requireDynamoTableRefs = (this.config.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? 
+            true : false;
+            
+        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
+            this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
         console.log('this.config', this.config);
 
@@ -38,7 +41,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
         } else {
             throw new Error(`You must provide an authorizer type if a Authorizer is required`);
         }
-
 
         this.onInit();
     }

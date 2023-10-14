@@ -13,7 +13,7 @@ import { createSeedDatabaseCustomResource } from "../resources/customResource/cr
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
-    protected readonly requireSeedDatabase: boolean = false;
+    protected requireSeedDatabase: boolean = false;
     protected readonly hasLambdaLayers: boolean = false;  
     protected appConfig: AppConfig;
 
