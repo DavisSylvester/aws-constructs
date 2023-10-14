@@ -20,10 +20,10 @@ export class MicroService extends Construct {
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
         super(scope, id);
 
-        console.table(props);
-
-        this.appConfig = new AppConfig(props);
+        this.appConfig = new AppConfig(props);  
+        
         console.log('this.appConfig', this.appConfig);
+        console.log('props', props);
         
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;

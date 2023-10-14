@@ -15,9 +15,8 @@ import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
 import { Routes } from "../helpers/createRoutes";
 
-export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
-
-    protected requireDynamoTableRefs: boolean;
+export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
+    
     protected requireAuthorizer: boolean;
     protected authorizer?: TsgAuthorizerType;
 
@@ -27,14 +26,11 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult>{
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
-
-        this.requireDynamoTableRefs = (this.config.RESOURCES.DYNAMO?.TABLE_REFS?.length ?? 0 > 0) ? 
-            true : false;
-            
+console.log('this.config', this.config);
         this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
             this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
-        console.log('this.config', this.config);
+        
 
         if (this.requireAuthorizer) {
             this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
