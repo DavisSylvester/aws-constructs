@@ -39,6 +39,7 @@ export class LambdaHelper {
         layers: LayerVersion[] | undefined, 
         appConfig: AppConfig, 
         scope: Construct) {
+           
         let lambdaProps = this.createLambdaProps(config, role, layers);
 
         const lambdaId = this.getIdForLambda(config, appConfig);
@@ -68,7 +69,7 @@ export class LambdaHelper {
         const { prop, role, layers } = props;
 
         const config = props.props?.appConfig;
-
+    
         const lambdaProp: NodejsFunctionProps = {
             entry: path.join(prop.codePath),
             functionName: `${config?.AppPrefix}-${prop.name}`,

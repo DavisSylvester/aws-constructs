@@ -26,11 +26,9 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
-console.log('this.config', this.config);
-        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
-            this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
-        console.log('this.requireAuthorizer', this.requireAuthorizer);
+        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
+            this.config.RESOURCES.AUTHORIZER.type) ? true : false;       
 
         if (this.requireAuthorizer) {
             this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
