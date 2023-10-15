@@ -30,7 +30,7 @@ export class LambdaHelper {
                 });
                 return createdLambdas || [];
             } else {
-                return LambdaHelper.createLambda(lambdaConfigs as TsgLambdaProp, role, layers, appConfig, scope);
+                return LambdaHelper.createLambda(lambdaConfigs as TsgLambdaProp, role, layers, config, scope);
             }
     }
 
@@ -40,7 +40,12 @@ export class LambdaHelper {
         appConfig: AppConfig, 
         scope: Construct) {
            
-        let lambdaProps = this.createLambdaProps(config, role, layers);
+        let lambdaProps = this.createLambdaProps(config, role, layers, {
+            appConfig: appConfig,
+            role,
+            layers,
+            scope
+        });
 
         const lambdaId = this.getIdForLambda(config, appConfig);
         let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);

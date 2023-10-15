@@ -19,15 +19,6 @@ export const createSeedDatabaseCustomResource = (scope: Construct, config: AppCo
             seedLambda!, 
             undefined, 
             layers!) as NodejsFunction;
-    // const databaseSeedLambda = new NodejsFunction(scope, `${config.AppPrefix}-database-seed-cr`, {
-    //     runtime: Runtime.NODEJS_LATEST,
-    //     handler: seedLambda?.handler,
-    //     entry: path.resolve(seedLambda?.codePath!),
-    //     environment: {
-    //         ...seedLambda?.environment
-    //     },
-    //     layers
-    // });
 
     database.grantReadWriteData(databaseSeedLambda);
 
