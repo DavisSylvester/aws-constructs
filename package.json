@@ -1,6 +1,6 @@
 {
   "name": "@sylvesterllc/aws-constructs",
-  "version": "1.0.58",
+  "version": "1.0.59",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
@@ -16,7 +16,7 @@
     "clean": "rm -rf dist",
     "clean:nm": "rm -rf node_modules && rm package-lock.json",
     "clean:layers": "rm -rf ./src/resources/layers/common/dist",
-    "publish:lib": "npm run build && npm publish",
+    "publish:lib": "npm run build && npm publish --access public",
     "preinstall": "npx only-allow pnpm"
   },
   "repository": {
