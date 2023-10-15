@@ -6,10 +6,12 @@ import { AppConfig } from "../../config/AppConfig";
 import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/aws-lambda-nodejs";
 import path = require("path");
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { ITableV2 } from "aws-cdk-lib/aws-dynamodb";
 
-export const createAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[]) => {
+export const createAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[],
+    tables?: ITableV2[]) => {
 
-    const lambda = createLambdaForAuthorizer(scope, config);
+    const lambda = createLambdaForAuthorizer(scope, config, layers, tables);
 
     const lambdaAuthroizer = new RequestAuthorizer(
         scope,
@@ -25,7 +27,7 @@ export const createAuthorizer = (scope: Construct, config: AppConfig, layers?: L
     return lambdaAuthroizer;
 };
 
-const createLambdaForAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[]) => {
+const createLambdaForAuthorizer = (scope: Construct, config: AppConfig, layers?: LayerVersion[], tables?: ITableV2[]) => {
 
     const props = createLambdaProps(config, layers);
 
@@ -35,6 +37,12 @@ const createLambdaForAuthorizer = (scope: Construct, config: AppConfig, layers?:
         props
     );
 
+        if (tables && tables.length > 0) {
+            tables.forEach((table) => {
+                table.grantReadData(lambda);
+             }); 
+        }
+    
     return lambda;
  };
 

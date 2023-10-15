@@ -6,6 +6,7 @@ import { BaseResource } from "../base/baseResource";
 import { CfnOutput } from "aws-cdk-lib";
 import { createAuthorizer } from "./createAuthorizerHelpers";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { ITableV2 } from "aws-cdk-lib/aws-dynamodb";
 
 
 export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
@@ -14,12 +15,12 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
         return (this.createdResources && this.createdResources.length > 0) ? this.createdResources[0] : undefined;
     }
 
-    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
+    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[], private tables?: ITableV2[]) {
         super(scope, config);
     }
 
     protected createResource(scope: Construct): RequestAuthorizer[] | null {
-        const authorizer = createAuthorizer(scope, this.config, this.layers);
+        const authorizer = createAuthorizer(scope, this.config, this.layers, this.tables);
         return [authorizer];
     }
 

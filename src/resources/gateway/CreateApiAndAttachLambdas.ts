@@ -18,7 +18,7 @@ import { Routes } from "../helpers/createRoutes";
 export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     
     protected requireAuthorizer: boolean;
-    protected authorizer?: TsgAuthorizerType;
+    protected authorizerType?: TsgAuthorizerType;
 
     constructor(scope: Construct,
         config: AppConfig,
@@ -33,7 +33,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             this.config.RESOURCES.AUTHORIZER.type) ? true : false;       
 
         if (this.requireAuthorizer) {
-            this.authorizer = this.config.RESOURCES.AUTHORIZER?.type;
+            this.authorizerType = this.config.RESOURCES.AUTHORIZER?.type;
         } else if (this.config.RESOURCES.AUTHORIZER && !this.config.RESOURCES.AUTHORIZER.type) {
             throw new Error(`You must provide an authorizer type if a Authorizer is required`);
         }
@@ -81,7 +81,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
         let authorizer: TokenAuthorizer | RequestAuthorizer | undefined = undefined;
 
-        if (this.requireAuthorizer && this.authorizer === TsgAuthorizerType.TOKEN_AUTHORIZER) {
+        if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.TOKEN_AUTHORIZER) {
 
             authorizer = new TsgJwtTokenAuthorizer(this.scope,
                 this.config).JwtAuthorizer;
@@ -91,9 +91,9 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
             return authorizer;
 
-        } else if (this.requireAuthorizer && this.authorizer === TsgAuthorizerType.REQUEST_AUTHORIZER) {
+        } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {
             authorizer = new TsgRequestAuthorizer(this.scope,
-                this.config).RequestAuthorizer as RequestAuthorizer;
+                this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
             authorizer?._attachToApi(this.gatewayApi);
             authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
