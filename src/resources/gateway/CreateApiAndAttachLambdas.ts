@@ -130,7 +130,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             }
 
             Routes.createResource(prop, gateway, lambdaNode, authorizer);
-
         });
     }
 }
