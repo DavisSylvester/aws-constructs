@@ -6,7 +6,7 @@ import { ApiLambdaResult } from "../../interfaces/ApiLambdaResult";
 import { TsgAuthorizerType } from "../../config/types/TsgAuthorizerType";
 import { IRestApi, RequestAuthorizer, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { TsgJwtTokenAuthorizer } from "../lambda-authorizer/TsgJwtTokenAuthorizer";
-import { RemovalPolicy } from "aws-cdk-lib";
+import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { TsgRequestAuthorizer } from "../lambda-authorizer/TsgRequestAuthorizer";
 import { CreateLambda } from "../lambda/createLambda";
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
@@ -27,6 +27,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         private tables?: ITable[]) {
         super(scope, config);
 
+        console.log('### CreateApiAndAttachLambdas ### Constructor ###: ', config);
+        
         this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
             this.config.RESOURCES.AUTHORIZER.type) ? true : false;       
 
@@ -36,19 +38,10 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             throw new Error(`You must provide an authorizer type if a Authorizer is required`);
         }
 
-        this.onInit();
+        this.createdResources = this.createResource(scope)!;
     }
 
-    protected createResource(scope: Construct): any[] | null {
-
-        return null;
-    }
-
-    protected createOutput<T>(scope: Construct, createdAssets: T[]): void {
-        return;
-    }
-
-    private onInit() {
+    protected createResource(scope: Construct): ApiLambdaResult[] | null {
 
         let authorizer: TokenAuthorizer | RequestAuthorizer | undefined | null = undefined;
 
@@ -68,8 +61,21 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         // Create Routes on API Gateway for Lambdas from config
         this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer || undefined);
 
-        return lambdas.Lambdas;
+        const result: ApiLambdaResult = {
+            api: this.gatewayApi,
+            authorizer: authorizer
+        };
+        return [result];
     }
+
+    protected createOutput<T>(scope: Construct, createdAssets: T[]): void {
+        
+        this.createdResources!.forEach((x, idx) => {
+            new CfnOutput(scope, `Authorizerr-${idx}`, {
+                value: x.authorizer?.authorizerArn!
+            });
+        });
+    }    
 
     private createAuthorizer() {
 
