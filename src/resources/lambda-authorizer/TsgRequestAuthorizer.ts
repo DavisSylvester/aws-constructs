@@ -17,6 +17,10 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
 
     constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[], private tables?: ITableV2[]) {
         super(scope, config);
+
+        this.createResource(scope);
+
+        this.createOutput(scope, this.createdResources);
     }
 
     protected createResource(scope: Construct): RequestAuthorizer[] | null {
