@@ -14,6 +14,8 @@ export class Routes {
         lambdaNode: NodejsFunction,
         authorizer?: TokenAuthorizer|RequestAuthorizer): void {
 
+            console.log('### ROUTES ### AUTHORIZER ###', authorizer);
+
         const routeMap: Map<string, Resource> = new Map();
 
         let activeRoutePath = "";
