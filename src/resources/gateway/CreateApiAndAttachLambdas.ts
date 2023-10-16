@@ -48,6 +48,19 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         // Create Authorizer
         if (this.requireAuthorizer) {
             authorizer = this.createAuthorizer();
+
+            if (!authorizer) {
+                throw new Error("Error Creating Authorizer");
+                
+            }
+            else {
+                console.log('Authorizer Created', authorizer);
+            }
+
+            return [{
+                api: this.gatewayApi,
+                authorizer
+            }];
         }
 
         // Create Lambdas
@@ -59,7 +72,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Routes on API Gateway for Lambdas from config
-        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer || undefined);
+        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
 
         const result: ApiLambdaResult = {
             api: this.gatewayApi,
