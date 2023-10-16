@@ -92,6 +92,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             return authorizer;
 
         } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {
+            console.log(' Creating a Request Authorizer');
+            
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
