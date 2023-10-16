@@ -58,10 +58,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
                 console.log('Authorizer Created', authorizer);
             }
 
-            return [{
-                api: this.gatewayApi,
-                authorizer
-            }];
+            
         }
 
         // Create Lambdas
