@@ -14,7 +14,7 @@ export class Routes {
         lambdaNode: NodejsFunction,
         authorizer?: TokenAuthorizer|RequestAuthorizer): void {
 
-            console.log('### ROUTES ### AUTHORIZER ###', authorizer);
+         
 
         const routeMap: Map<string, Resource> = new Map();
 
@@ -22,9 +22,7 @@ export class Routes {
         let activeResource: Resource | undefined = undefined;
 
         //  Only attach lambda to an Api Gateway if a route exist
-        if (prop.apiGateway?.route) {
-
-            console.log('ROute: ', prop.apiGateway.route);
+        if (prop.apiGateway?.route) {           
 
             if (!prop.apiGateway.useRouteOverride) {
                 //  First we create the root resource if it doesn't exist.

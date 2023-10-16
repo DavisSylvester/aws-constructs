@@ -71,7 +71,7 @@ export class MicroService extends Construct {
 
                console.log('myConfig', this.appConfig);
 
-               console.log('Authorizer Type::: ', this.appConfig.RESOURCES.AUTHORIZER?.type)
+              
         // CREATE API GATEWAY AND LAMBDA HERE 
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
        
