@@ -29,7 +29,7 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
     }
 
     protected createOutput<T>(scope: Construct, createdAssets: T[]): void {
-        createdAssets.forEach((asset) => {
+        createdAssets?.forEach((asset) => {
             if (asset instanceof RequestAuthorizer) {
                 // Output the ARN of the authorizer
                 new CfnOutput(scope, "RequestAuthorizerArn", {
