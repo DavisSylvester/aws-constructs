@@ -58,6 +58,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             this.assignAccessToTables(this.tables, lambdas.Lambdas);
         }
 
+        console.log('### AUTHORIZER BEFORE ADDING ROUTERS ####', authorizer);
+        
         // Create Routes on API Gateway for Lambdas from config
         this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer || undefined);
 
@@ -93,12 +95,14 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
         } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {
             console.log(' Creating a Request Authorizer');
-            
+
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
             authorizer?._attachToApi(this.gatewayApi);
             authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+
+            console.log('RETURNING AUTHORIZER: ', authorizer);
 
             return authorizer;
         }
