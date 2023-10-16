@@ -143,6 +143,10 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         lambdas: NodejsFunction[],
         authorizer?: TokenAuthorizer|RequestAuthorizer) {
 
+            console.log('gateway', gateway);
+            console.log('lambdas', lambdas);
+            console.log('authorizer', authorizer);
+
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
             const lambdaId = CreateLambda.getIdForLambda(prop, this.config);

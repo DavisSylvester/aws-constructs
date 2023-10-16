@@ -21,7 +21,7 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
         private tables?: ITableV2[]) {
         super(scope, config);
 
-        this.createResource(scope);        
+        this.createdResources = this.createResource(scope)!;        
     }
 
     protected createResource(scope: Construct): RequestAuthorizer[] | null {
