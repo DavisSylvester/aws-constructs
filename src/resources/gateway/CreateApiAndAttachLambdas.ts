@@ -100,7 +100,13 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
             return authorizer;
         }
-        return null;
+
+        authorizer = new TsgRequestAuthorizer(this.scope,
+            this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
+
+        authorizer?._attachToApi(this.gatewayApi);
+        authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+        return authorizer;
     }
 
     private assignAccessToTables(tables: ITable[], lambdas: NodejsFunction[]) {
