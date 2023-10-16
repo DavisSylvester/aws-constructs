@@ -14,6 +14,7 @@
     "test": "jest",
     "cdk": "cdk",
     "clean": "rm -rf dist",
+    "clean:install": "npm run clean:nm && pnpm i",
     "clean:nm": "rm -rf node_modules && rm package-lock.json",
     "clean:layers": "rm -rf ./src/resources/layers/common/dist",
     "publish:lib": "npm run build && npm publish --access public",
