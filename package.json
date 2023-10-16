@@ -1,6 +1,6 @@
 {
   "name": "@sylvesterllc/aws-constructs",
-  "version": "1.0.78",
+  "version": "1.0.79",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
@@ -43,7 +43,7 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.100.0",
+    "aws-cdk-lib": "^2.101.0",
     "constructs": "^10.3.0",
     "dotenv": "^16.3.1",
     "fsbin": "^1.0.11",
