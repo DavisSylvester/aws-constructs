@@ -21,18 +21,15 @@ export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
         private tables?: ITableV2[]) {
         super(scope, config);
 
-        this.createResource(scope);        
+        this.createdResources = this.createResource(scope)!;        
     }
 
     protected createResource(scope: Construct): RequestAuthorizer[] | null {
-        try {
+        
         const authorizer = createAuthorizer(scope, this.config, this.layers, this.tables);
-        console.log('AWS ### AUTHORIZER', authorizer);
+        
         return [authorizer];
-        } catch (error) {
-            console.error('Error creating Authorizer', error);
-            throw error;
-        }
+        
     }
 
     protected createOutput<T>(scope: Construct, createdAssets: T[]): void {

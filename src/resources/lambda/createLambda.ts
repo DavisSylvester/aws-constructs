@@ -68,10 +68,6 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             const lambdaId = CreateLambda.getIdForLambda(config, this.config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
-            if (lambdaId === fctn.node.id) {
-                console.log(`found Lambda for : ${fctn.node.id}`);
-            }
-
             return fctn;
         });
 

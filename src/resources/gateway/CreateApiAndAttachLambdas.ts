@@ -48,6 +48,17 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         // Create Authorizer
         if (this.requireAuthorizer) {
             authorizer = this.createAuthorizer();
+
+            if (!authorizer) {
+                console.log('Authorizer Not Created');
+                // throw new Error("Error Creating Authorizer");
+                
+            }
+            else {
+                console.log('Authorizer Created', authorizer);
+            }
+
+            
         }
 
         // Create Lambdas
@@ -61,7 +72,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         console.log('### AUTHORIZER BEFORE ADDING ROUTERS ####', authorizer);
         
         // Create Routes on API Gateway for Lambdas from config
-        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer || undefined);
+        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
 
         const result: ApiLambdaResult = {
             api: this.gatewayApi,
@@ -107,11 +118,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             return authorizer;
         }
 
-        authorizer = new TsgRequestAuthorizer(this.scope,
-            this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
-
-        authorizer?._attachToApi(this.gatewayApi);
-        authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+       
         return authorizer;
     }
 
@@ -133,6 +140,10 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         gateway: IRestApi,
         lambdas: NodejsFunction[],
         authorizer?: TokenAuthorizer|RequestAuthorizer) {
+
+            console.log('gateway', gateway);
+            console.log('lambdas', lambdas);
+            console.log('authorizer', authorizer);
 
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
