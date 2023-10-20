@@ -60,7 +60,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Lambdas
-        const lambdas = new CreateLambda(this.scope, this.config, this.layers);
+        const lambdas = new CreateLambda(scope, this.config, this.layers);
         
         // Give Access to Lambdds to All DynamoDb Tables
         if (this.tables) {
