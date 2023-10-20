@@ -43,6 +43,10 @@ export class Routes {
                 activeResource = secondaryResource;
             }
 
+            if (prop.apiGateway.secure) {
+                console.log(`######## ${prop.name} ############`);
+                console.log(`### AUTHORIZER ###`, authorizer)
+            }
             //  Finally, we attach our function to the last resource
             activeResource!.addMethod(prop.apiGateway.method || 'GET',
                 new LambdaIntegration(lambdaNode, { proxy: true, }),

@@ -26,8 +26,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
-
-        console.log('### CreateApiAndAttachLambdas ### Constructor ###: ', config);
         
         this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
             this.config.RESOURCES.AUTHORIZER.type) ? true : false;       
@@ -110,8 +108,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
-            authorizer?._attachToApi(this.gatewayApi);
-            authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+            authorizer._attachToApi(this.gatewayApi);
+            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             console.log('RETURNING AUTHORIZER: ', authorizer);
 
