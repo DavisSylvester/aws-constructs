@@ -9,7 +9,6 @@ import { TsgJwtTokenAuthorizer } from "../lambda-authorizer/TsgJwtTokenAuthorize
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { TsgRequestAuthorizer } from "../lambda-authorizer/TsgRequestAuthorizer";
 import { CreateLambda } from "../lambda/createLambda";
-import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
