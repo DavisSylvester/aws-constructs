@@ -12,7 +12,7 @@ import { ITableV2 } from "aws-cdk-lib/aws-dynamodb";
 export class TsgRequestAuthorizer extends BaseResource<RequestAuthorizer> {
 
     get RequestAuthorizer() {
-        return (this.createdResources && this.createdResources.length > 0) ? this.createdResources[0] : undefined;
+        return this.createdResources[0];
     }
 
     constructor(scope: Construct, 
