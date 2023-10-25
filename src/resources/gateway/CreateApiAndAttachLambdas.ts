@@ -96,7 +96,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             authorizer = new TsgJwtTokenAuthorizer(this.scope,
                 this.config).JwtAuthorizer;
 
-            authorizer?._attachToApi(this.gatewayApi);
+            // authorizer?._attachToApi(this.gatewayApi);
             authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             return authorizer;
@@ -107,7 +107,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
-            authorizer._attachToApi(this.gatewayApi);
+            // authorizer._attachToApi(this.gatewayApi);
             authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             console.log('RETURNING AUTHORIZER: ', authorizer);

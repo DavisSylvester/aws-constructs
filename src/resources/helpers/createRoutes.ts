@@ -45,7 +45,8 @@ export class Routes {
 
             if (prop.apiGateway.secure) {
                 console.log(`######## ${prop.name} ############`);
-                console.log(`### AUTHORIZER ###`, authorizer)
+                console.log(`### AUTHORIZER ###`, authorizer);
+                console.log(`### AUTHORIZER Id ###`, authorizer?.authorizerId)
             }
             //  Finally, we attach our function to the last resource
             activeResource!.addMethod(prop.apiGateway.method || 'GET',
