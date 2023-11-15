@@ -83,29 +83,28 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
     private createAuthorizer() {
 
-        let authorizer: TokenAuthorizer | RequestAuthorizer | undefined = undefined;
+        let authorizer: TokenAuthorizer | RequestAuthorizer | unknown | undefined = undefined;
 
         if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.TOKEN_AUTHORIZER) {
 
             authorizer = new TsgJwtTokenAuthorizer(this.scope,
                 this.config).JwtAuthorizer;
 
-            // authorizer?._attachToApi(this.gatewayApi);
-            authorizer?.applyRemovalPolicy(RemovalPolicy.DESTROY);
+            (authorizer as TokenAuthorizer)?._attachToApi(this.gatewayApi);
+            (authorizer as TokenAuthorizer)?.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
             return authorizer;
 
-        } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {
-            console.log(' Creating a Request Authorizer');
+        } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {            
 
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
 
-            authorizer._attachToApi(this.gatewayApi);
-            authorizer.applyRemovalPolicy(RemovalPolicy.DESTROY);
-
-            console.log('RETURNING AUTHORIZER: ', authorizer);
-
+                console.log('Attaching to API');
+                (authorizer as RequestAuthorizer)._attachToApi(this.gatewayApi);
+                console.log('Attaching to API ---> Complete');
+                (authorizer as RequestAuthorizer).applyRemovalPolicy(RemovalPolicy.DESTROY);
+            
             return authorizer;
         }
 

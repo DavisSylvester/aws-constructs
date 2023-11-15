@@ -1,6 +1,6 @@
 {
   "name": "@sylvesterllc/aws-constructs",
-  "version": "1.0.86",
+  "version": "1.0.87",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
@@ -17,8 +17,7 @@
     "clean:install": "npm run clean:nm && pnpm i",
     "clean:nm": "rm -rf node_modules && rm package-lock.json",
     "clean:layers": "rm -rf ./src/resources/layers/common/dist",
-    "publish:lib": "npm run build && npm publish --access public",
-    "preinstall": "npx only-allow pnpm"
+    "publish:lib": "npm run build && npm publish --access public"    
   },
   "repository": {
     "type": "git",
@@ -49,6 +48,7 @@
     "dotenv": "^16.3.1",
     "fsbin": "^1.0.11",
     "luxon": "^3.4.3",
-    "source-map-support": "^0.5.21"
+    "source-map-support": "^0.5.21",
+    "winston": "^3.11.0"
   }
 }

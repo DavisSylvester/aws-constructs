@@ -65,10 +65,7 @@ export class MicroService extends Construct {
         if (this.requireSeedDatabase) {
             createSeedDatabaseCustomResource(scope, this.appConfig, tables![0], layers);
         }
-
-               console.log('myConfig', this.appConfig);
-
-              
+          
         // CREATE API GATEWAY AND LAMBDA HERE 
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
        
