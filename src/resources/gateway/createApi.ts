@@ -38,15 +38,15 @@ export class Api extends BaseResource<IRestApi> {
 
             this.createARecord(scope, zone, api);
 
-            this.createApiKey(this.config);
+            this.createApiKey(this.config, api);
 
             return api;
-            
+
         } else {
 
             const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps());
 
-            this.createApiKey(this.config);
+            this.createApiKey(this.config, api);
 
             return api;
         }
@@ -106,10 +106,10 @@ export class Api extends BaseResource<IRestApi> {
         return config.RESOURCES.LAMBDA.some((lambda) => lambda.apiGateway?.requireApiKey === true);
     }
 
-    private createApiKey(config: AppConfig) {
+    private createApiKey(config: AppConfig, api: RestApi) {
         
         if (this.requiresApiKey(this.config)) {
-            const apiKey = new TsgApiKey(this.scope, this.config, this.APIs[0] as RestApi)
+            const apiKey = new TsgApiKey(this.scope, this.config, api)
             return apiKey;
         }
         return null;
