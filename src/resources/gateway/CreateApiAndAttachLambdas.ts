@@ -61,8 +61,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         if (this.tables) {
             this.assignAccessToTables(this.tables, lambdas.Lambdas);
         }
-
-        console.log('### AUTHORIZER BEFORE ADDING ROUTERS ####', authorizer);
         
         // Create Routes on API Gateway for Lambdas from config
         this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
