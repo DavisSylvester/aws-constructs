@@ -12,9 +12,7 @@ export class Routes {
         prop: TsgLambdaProp,
         api: IRestApi,
         lambdaNode: NodejsFunction,
-        authorizer?: TokenAuthorizer|RequestAuthorizer): void {
-
-         
+        authorizer?: TokenAuthorizer|RequestAuthorizer): void {         
 
         const routeMap: Map<string, Resource> = new Map();
 

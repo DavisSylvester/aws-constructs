@@ -48,14 +48,10 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
             if (!authorizer) {
                 console.log('Authorizer Not Created');
-                // throw new Error("Error Creating Authorizer");
-                
             }
             else {
                 console.log('Authorizer Created', authorizer);
             }
-
-            
         }
 
         // Create Lambdas

@@ -8,6 +8,7 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 
 import { BaseResource } from "../base/baseResource";
 import { CreateCertificate } from "../certificate/createCertificate";
+import { TsgApiKey } from "./createApiKey";
 
 export class Api extends BaseResource<IRestApi> {
 
@@ -37,10 +38,15 @@ export class Api extends BaseResource<IRestApi> {
 
             this.createARecord(scope, zone, api);
 
+            this.createApiKey(this.config);
+
             return api;
+            
         } else {
 
             const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps());
+
+            this.createApiKey(this.config);
 
             return api;
         }
@@ -95,6 +101,19 @@ export class Api extends BaseResource<IRestApi> {
         return corsOptions;
     }
 
+    private requiresApiKey(config: AppConfig) {
+        // Determine if any of the lambdas require an API Key
+        return config.RESOURCES.LAMBDA.some((lambda) => lambda.apiGateway?.requireApiKey === true);
+    }
+
+    private createApiKey(config: AppConfig) {
+        
+        if (this.requiresApiKey(this.config)) {
+            const apiKey = new TsgApiKey(this.scope, this.config, this.APIs[0] as RestApi)
+            return apiKey;
+        }
+        return null;
+    }
     // private createCustomDomain(scope: Construct, config: MicroserviceProps) {
     //     const domainName = DomainName.fromDomainNameAttributes(scope, `${config.API.Name}-custom-domain`, {
     //         domainName: config.DNS?.ZoneName,
