@@ -83,7 +83,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
     private createAuthorizer() {
 
-        let authorizer: TokenAuthorizer | RequestAuthorizer | unknown | undefined = undefined;
+        let authorizer: TokenAuthorizer | RequestAuthorizer | undefined = undefined;
 
         if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.TOKEN_AUTHORIZER) {
 
@@ -98,7 +98,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {            
 
             authorizer = new TsgRequestAuthorizer(this.scope,
-                this.config, this.layers, this.tables).RequestAuthorizer as RequestAuthorizer;
+                this.config, this.layers, this.tables).TsgRequestAuthorizer as RequestAuthorizer;
 
                 console.log('Attaching to API');
                 (authorizer as RequestAuthorizer)._attachToApi(this.gatewayApi);
