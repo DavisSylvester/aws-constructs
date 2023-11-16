@@ -1,6 +1,6 @@
 {
   "name": "@sylvesterllc/aws-constructs",
-  "version": "1.0.87",
+  "version": "1.0.88",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
@@ -17,7 +17,7 @@
     "clean:install": "npm run clean:nm && pnpm i",
     "clean:nm": "rm -rf node_modules && rm package-lock.json",
     "clean:layers": "rm -rf ./src/resources/layers/common/dist",
-    "publish:lib": "npm run build && npm publish --access public"    
+    "publish:lib": "npm run build && npm publish --access public"
   },
   "repository": {
     "type": "git",
