@@ -47,10 +47,10 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
             authorizer = this.createAuthorizer();
 
             if (!authorizer) {
-                console.log('Authorizer Not Created');
+                // console.log('Authorizer Not Created');
             }
             else {
-                console.log('Authorizer Created', authorizer);
+                // console.log('Authorizer Created', authorizer);
             }
         }
 
@@ -99,10 +99,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).TsgRequestAuthorizer as RequestAuthorizer;
-
-                console.log('Attaching to API');
+                
                 (authorizer as RequestAuthorizer)._attachToApi(this.gatewayApi);
-                console.log('Attaching to API ---> Complete');
                 (authorizer as RequestAuthorizer).applyRemovalPolicy(RemovalPolicy.DESTROY);
             
             return authorizer;
