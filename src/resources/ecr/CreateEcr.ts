@@ -1,25 +1,25 @@
-import { LifecycleRule, Repository } from "aws-cdk-lib/aws-ecr";
+import * as ecr from "aws-cdk-lib/aws-ecr";
 import { BaseResource } from "../base/baseResource";
 import { Construct } from "constructs";
-import { AppConfig } from "../../config/AppConfig";
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
+import { BaseResourceProps } from "../../interfaces/BaseResourceProps";
 
-export class CreateECR extends BaseResource<Repository> {
+export class CreateECR extends BaseResource<ecr.Repository> {
 
-    constructor(protected scope: Construct, protected config: AppConfig) {
+    constructor(props: BaseResourceProps) {
 
-        super(scope, config);
+        super(props.scope, props.config);
 
-        const repos = this.createResource(scope);
+        const repos = this.createResource(props.scope);
 
         this.createdResources = [...repos as []];
 
-        this.createOutput(scope, this.createdResources);
+        this.createOutput(props.scope, this.createdResources);
     }
 
-    protected createResource(scope: Construct): Repository[] | null {
+    protected createResource(scope: Construct): ecr.Repository[] | null {
 
-        const ecrRepo = new Repository(scope,
+        const ecrRepo = new ecr.Repository(scope,
             `${this.config.AppName}-repository`,
             {
                 repositoryName: `${this.config.AppName}-repository`,
@@ -27,14 +27,14 @@ export class CreateECR extends BaseResource<Repository> {
                 autoDeleteImages: true,
             });
 
-        const rule: LifecycleRule = {
+        const rule: ecr.LifecycleRule = {
             description: 'Image Rentention',
             maxImageCount: 20
         };
 
         ecrRepo.addLifecycleRule(rule);
 
-        if (ecrRepo instanceof Repository) {
+        if (ecrRepo instanceof ecr.Repository) {
             return [ecrRepo];
         }
 
@@ -44,14 +44,15 @@ export class CreateECR extends BaseResource<Repository> {
     protected createOutput<Repository>(scope: Construct, createdAssets: Repository[]): void {
      
         createdAssets.forEach((x, idx) => {
-
+            
             new CfnOutput(scope, `respository-${idx}`, {
-                value: `Name: ${x}} \n Url: ${(x as Repository).repositoryUri}`
+                value: `Name: ${(x as ecr.Repository).repositoryName}\n
+                    Url: ${(x as ecr.Repository).repositoryUri}`
             });
         });
     }
 
-    isArrayOfType(resource: T): 
+    
 
 
 }
