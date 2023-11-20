@@ -7,7 +7,7 @@ import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/
 import { Construct } from "constructs";
 import * as path from 'path';
 import { AppConfig } from "../../config/AppConfig";
-import { LogDuration, TsgLambdaProp } from "../../config/types";
+import { TsgLambdaProp } from "../../config/types";
 
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunctionInput";
@@ -25,6 +25,8 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         super(scope, config);
 
         const resources = this.createResource(scope);
+
+        this.createdResources = [...resources];
 
         this.Lambdas = [...resources];
 
