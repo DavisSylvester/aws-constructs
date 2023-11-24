@@ -4,7 +4,7 @@ import { Construct } from "constructs";
 import { CfnOutput, RemovalPolicy } from "aws-cdk-lib";
 import { BaseResourceProps } from "../../interfaces/BaseResourceProps";
 
-export class CreateECR extends BaseResource<ecr.Repository> {
+export class TsgECR extends BaseResource<ecr.Repository> {
 
     constructor(props: BaseResourceProps) {
 
@@ -47,7 +47,7 @@ export class CreateECR extends BaseResource<ecr.Repository> {
             
             new CfnOutput(scope, `respository-${idx}`, {
                 value: `Name: ${(x as ecr.Repository).repositoryName}\n
-                    Url: ${(x as ecr.Repository).repositoryUri}`
+                Url: ${(x as ecr.Repository).repositoryUri}`
             });
         });
     }
