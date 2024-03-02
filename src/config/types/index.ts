@@ -1,4 +1,3 @@
-export * from "./Duration";
 export * from "./TsgAuthorizerProp";
 export * from "./TsgAuthorizerType";
 export * from "./TsgCognitoConfig";
