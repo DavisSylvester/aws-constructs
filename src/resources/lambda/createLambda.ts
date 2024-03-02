@@ -14,6 +14,7 @@ import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunction
 import { BaseResource } from "../base/baseResource";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { LambdaHelper } from "./lambdaHelper";
+import { getUUID } from "../../helpers/util-helper";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
@@ -61,7 +62,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         return createdLambdas;
     }
 
-    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {        
+    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
 
         const createdLambdas = this.config.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
 
@@ -133,31 +134,32 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 period: Duration.minutes(3),
             });
 
-            new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-error-alarm`, {
+            const uuid = getUUID().split('-')[0];
+            new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-error-alarm`, {
                 metric: errorMetric,
                 threshold: 5,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-error-alarm`
+                alarmDescription: `${this.config.AppPrefix} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${uuid}-error-alarm`
             });
 
-            new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-duration-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-duration-alarm`, {
                 metric: durationMetric,
                 threshold: 1,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} duration errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-duration-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${uuid} duration errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${uuid}-duration-alarm`
             });
 
-            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${idx}-invocation-alarm`, {
+            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-invocation-alarm`, {
                 metric: errorMetric,
                 threshold: 1000,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-invocation-Metric-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${uuid} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${uuid}-invocation-Metric-alarm`
             });
         });
     }
@@ -165,7 +167,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {
         return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
     }
-    
+
     private createRecordForLambda(lambdas: NodejsFunction[]) {
 
         const names = this.config.RESOURCES.LAMBDA.map((lambda) => {
@@ -175,14 +177,14 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         const lambdaNames = [...names] as const;
 
         type LambdaName = typeof lambdaNames[number];
-    
+
 
         const lambdaRecord: Record<LambdaName, NodejsFunction> = {} as Record<LambdaName, NodejsFunction>;
 
         lambdas.forEach((lambda, idx) => {
-            lambdaRecord[lambdaNames[idx]  as LambdaName] = lambdas[idx];
+            lambdaRecord[lambdaNames[idx] as LambdaName] = lambdas[idx];
         });
-        
+
         return lambdaRecord;
     }
 }
