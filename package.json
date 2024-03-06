@@ -1,6 +1,6 @@
 {
   "name": "@sylvesterllc/aws-constructs",
-  "version": "1.0.91",
+  "version": "1.0.92",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
