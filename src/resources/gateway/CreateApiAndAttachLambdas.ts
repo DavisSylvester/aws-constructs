@@ -15,9 +15,15 @@ import { TsgLambdaProp } from "../../config/types";
 import { Routes } from "../helpers/createRoutes";
 
 export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
-    
+
     protected requireAuthorizer: boolean;
     protected authorizerType?: TsgAuthorizerType;
+
+    private lambdas: NodejsFunction[] = [];
+
+    public get Lambdas() {
+        return this.lambdas;
+    }
 
     constructor(scope: Construct,
         config: AppConfig,
@@ -25,9 +31,9 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
-        
-        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER && 
-            this.config.RESOURCES.AUTHORIZER.type) ? true : false;       
+
+        this.requireAuthorizer = (this.config.RESOURCES.AUTHORIZER &&
+            this.config.RESOURCES.AUTHORIZER.type) ? true : false;
 
         if (this.requireAuthorizer) {
             this.authorizerType = this.config.RESOURCES.AUTHORIZER?.type;
@@ -56,12 +62,13 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
         // Create Lambdas
         const lambdas = new CreateLambda(scope, this.config, this.layers);
-        
+        this.lambdas = lambdas.Lambdas;
+
         // Give Access to Lambdds to All DynamoDb Tables
         if (this.tables) {
             this.assignAccessToTables(this.tables, lambdas.Lambdas);
         }
-        
+
         // Create Routes on API Gateway for Lambdas from config
         this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
 
@@ -73,13 +80,13 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     }
 
     protected createOutput<T>(scope: Construct, createdAssets: T[]): void {
-        
+
         this.createdResources!.forEach((x, idx) => {
             new CfnOutput(scope, `Authorizerr-${idx}`, {
                 value: x.authorizer?.authorizerArn!
             });
         });
-    }    
+    }
 
     private createAuthorizer() {
 
@@ -95,18 +102,18 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
             return authorizer;
 
-        } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {            
+        } else if (this.requireAuthorizer && this.authorizerType === TsgAuthorizerType.REQUEST_AUTHORIZER) {
 
             authorizer = new TsgRequestAuthorizer(this.scope,
                 this.config, this.layers, this.tables).TsgRequestAuthorizer as RequestAuthorizer;
-                
-                (authorizer as RequestAuthorizer)._attachToApi(this.gatewayApi);
-                (authorizer as RequestAuthorizer).applyRemovalPolicy(RemovalPolicy.DESTROY);
-            
+
+            (authorizer as RequestAuthorizer)._attachToApi(this.gatewayApi);
+            (authorizer as RequestAuthorizer).applyRemovalPolicy(RemovalPolicy.DESTROY);
+
             return authorizer;
         }
 
-       
+
         return authorizer;
     }
 
@@ -127,7 +134,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     private AddRoutes(config: AppConfig,
         gateway: IRestApi,
         lambdas: NodejsFunction[],
-        authorizer?: TokenAuthorizer|RequestAuthorizer) {
+        authorizer?: TokenAuthorizer | RequestAuthorizer) {
 
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 

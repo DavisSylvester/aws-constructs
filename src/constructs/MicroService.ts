@@ -12,29 +12,47 @@ import { CreateApiAndAttachLambdas } from "../resources/gateway/CreateApiAndAtta
 import { createSeedDatabaseCustomResource } from "../resources/customResource/createSeedDatabaseCustomResource";
 import { IRestApi } from "aws-cdk-lib/aws-apigateway";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
     protected requireSeedDatabase: boolean = false;
-    protected readonly hasLambdaLayers: boolean = false;  
+    protected readonly hasLambdaLayers: boolean = false;
     protected appConfig: AppConfig;
     private readonly api: IRestApi;
     private readonly dynamoTables: Table[] | undefined;
     private readonly lambdaLayers: LayerVersion[] | undefined;
     private readonly secretManager: ISecret | null = null;
+    private readonly lambdas: NodejsFunction[] = [];
+
+    public get Tables() {
+        return this.dynamoTables;
+    }
+
+    public get SecretManager() {
+        return this.secretManager;
+    }
+
+    public get LambdaLayers() {
+        return this.lambdaLayers;
+    }
+
+    public get Lambdas() {
+        return this.lambdas;
+    }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
         super(scope, id);
 
-        this.appConfig = new AppConfig(props);  
-               
+        this.appConfig = new AppConfig(props);
+
         this.requireDynamoTables = (props.RESOURCES.DYNAMO?.TABLES &&
             props.RESOURCES.DYNAMO.TABLES.length > 0) ? true : false;
 
-        this.requireSeedDatabase = (props.RESOURCES.DYNAMO?.USE_SEED_DATABASE && 
+        this.requireSeedDatabase = (props.RESOURCES.DYNAMO?.USE_SEED_DATABASE &&
             props.RESOURCES.DYNAMO.SEED_LAMBDA) ? true : false;
 
-        this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS && 
+        this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS &&
             props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
 
         const results = this.onInit(scope);
@@ -43,6 +61,8 @@ export class MicroService extends Construct {
         this.dynamoTables = results.dynamoTables!;
         this.lambdaLayers = results.lambdaLayers!;
         this.secretManager = results.secretManager!;
+
+        this.lambdas = results.lambdas!;
 
         this.createTag(scope)
     }
@@ -56,7 +76,7 @@ export class MicroService extends Construct {
         if (process.env.SECRET_MANAGER_ARN) {
             // throw new Error(`You must provide the ARN for the your Configuration Secret 
             //     Manager`);      
-             secretManager = getSecretManager(scope, this.appConfig, process.env.SECRET_MANAGER_ARN);            
+            secretManager = getSecretManager(scope, this.appConfig, process.env.SECRET_MANAGER_ARN);
         }
 
         if (this.hasLambdaLayers) {
@@ -77,18 +97,19 @@ export class MicroService extends Construct {
         if (this.requireSeedDatabase) {
             createSeedDatabaseCustomResource(scope, this.appConfig, tables![0], layers);
         }
-          
+
         // CREATE API GATEWAY AND LAMBDA HERE 
-        const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers,tables);
+        const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers, tables);
 
         return {
             restApi: (gateway?.length > 0) ? gateway[0] : null,
             lambdaLayers: layers || null,
             dynamoTables: tables || null,
             secretManager: secretManager,
+            lambdas: apiGateway.Lambdas,
 
         };
-       
+
     }
 
     protected createTag(scope: Construct) {
