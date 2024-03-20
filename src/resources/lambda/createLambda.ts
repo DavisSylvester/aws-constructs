@@ -135,31 +135,32 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
             });
 
             const uuid = getUUID().split('-')[0];
-            new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-error-alarm`, {
+
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-error-alarm`, {
                 metric: errorMetric,
                 threshold: 5,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
                 alarmDescription: `${this.config.AppPrefix} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${uuid}-error-alarm`
+                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-error-alarm`
             });
 
-            new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-duration-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-duration-alarm`, {
                 metric: durationMetric,
                 threshold: 1,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${uuid} duration errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${uuid}-duration-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.functionName} duration errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-duration-alarm`
             });
 
-            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${uuid}-invocation-alarm`, {
+            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-invocation-alarm`, {
                 metric: errorMetric,
                 threshold: 1000,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${uuid} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${uuid}-invocation-Metric-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.functionName} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-invocation-Metric-alarm`
             });
         });
     }
