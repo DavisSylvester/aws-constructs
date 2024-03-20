@@ -119,6 +119,12 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
     private createAlarmsForLambdas(lambdas: NodejsFunction[]) {
 
+        const lambdaRecords = this.createRecordForLambda(lambdas);
+
+        console.log('Lambda Records:', lambdaRecords);
+        const lambdaNames = Object.keys(lambdaRecords);
+        console.log('lambda Names from Records', lambdaNames);
+
         lambdas.forEach((lambda, idx) => {
 
             const errorMetric = lambda.metricErrors({
@@ -136,31 +142,31 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
             const uuid = getUUID().split('-')[0];
 
-            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-error-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-error-alarm`, {
                 metric: errorMetric,
                 threshold: 5,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
                 alarmDescription: `${this.config.AppPrefix} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-error-alarm`
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-error-alarm`
             });
 
-            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-duration-alarm`, {
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-duration-alarm`, {
                 metric: durationMetric,
                 threshold: 1,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${lambda.functionName} duration errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-duration-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.node.id} duration errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-duration-alarm`
             });
 
-            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.functionName}-invocation-alarm`, {
+            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-invocation-alarm`, {
                 metric: errorMetric,
                 threshold: 1000,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${lambda.functionName} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${lambda.functionName}-invocation-Metric-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.node.id} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-invocation-Metric-alarm`
             });
         });
     }
