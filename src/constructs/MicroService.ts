@@ -108,6 +108,8 @@ export class MicroService extends Construct {
 
         this.lambdaRecords = apiGateway.LambdaRecords;
 
+        console.log('lambda Records:', this.lambdaRecords)
+
         return {
             restApi: (gateway?.length > 0) ? gateway[0] : null,
             lambdaLayers: layers || null,
