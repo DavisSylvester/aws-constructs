@@ -119,11 +119,11 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
     private createAlarmsForLambdas(lambdas: NodejsFunction[]) {
 
-        // const lambdaRecords = this.createRecordForLambda(lambdas);
+        const lambdaRecords = this.createRecordForLambda(lambdas);
 
-        // console.log('Lambda Records:', lambdaRecords);
-        // const lambdaNames = Object.keys(lambdaRecords);
-        // console.log('lambda Names from Records', lambdaNames);
+        console.log('Lambda Records:', lambdaRecords);
+        const lambdaNames = Object.keys(lambdaRecords);
+        console.log('lambda Names from Records', lambdaNames);
 
         lambdas.forEach((lambda, idx) => {
 
