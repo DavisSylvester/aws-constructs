@@ -20,9 +20,14 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     protected authorizerType?: TsgAuthorizerType;
 
     private lambdas: NodejsFunction[] = [];
+    private lambdaRecords: Record<string, NodejsFunction> = {};
 
     public get Lambdas() {
         return this.lambdas;
+    }
+
+    public get LambdaRecords() {
+        return this.lambdaRecords;
     }
 
     constructor(scope: Construct,
@@ -63,6 +68,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         // Create Lambdas
         const lambdas = new CreateLambda(scope, this.config, this.layers);
         this.lambdas = lambdas.Lambdas;
+        this.lambdaRecords = this.lambdaRecords;
 
         // Give Access to Lambdds to All DynamoDb Tables
         if (this.tables) {

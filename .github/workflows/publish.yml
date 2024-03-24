@@ -1,37 +1,37 @@
 name: Publish package to GitHub Packages
-on:  
+on:
   push:
     branches:
       - develop
 
 jobs:
   build:
-    runs-on: ubuntu-latest 
-    permissions: 
+    runs-on: ubuntu-latest
+    permissions:
       contents: read
-      packages: write 
+      packages: write
     steps:
       - uses: actions/checkout@v3
       # Setup .npmrc file to publish to GitHub Packages
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: "18.x"
           # registry-url: 'https://npm.pkg.github.com/'
           # scope: '@sylvesterllc'
       - run: npm i -g pnpm
       - run: pnpm i
       - run: git config user.email "davis@sylvesterllc.com"
       - run: git config user.name "Davis Sylvester III"
-      - run: cp .npmrc src/resources/layers/common      
+      - run: cp .npmrc src/resources/layers/common
       - run: npm set //registry.npmjs.org/:_authToken $NPM_REGISTRY_TOKEN
       - run: npm set //npm.pkg.github.com/:_authToken $CICD_TOKEN
       # - run: npm adduser
-      
+
       # - run: npm config set '//npm.pkg.github.com/:_authToken' ${{ secrets.CICD_TOKEN }}
-      # - run: npm run build:layers      
+      # - run: npm run build:layers
       # - run: npm version patch  // This is also done in the npm publish:lib script
       - run: npm run publish:lib
-      # - run: npm publish
+        # - run: npm publish
         env:
           CICD_TOKEN: ${{ secrets.CICD_TOKEN }}
           NPM_REGISTRY_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}

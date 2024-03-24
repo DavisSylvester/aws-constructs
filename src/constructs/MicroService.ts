@@ -24,6 +24,7 @@ export class MicroService extends Construct {
     private readonly lambdaLayers: LayerVersion[] | undefined;
     private readonly secretManager: ISecret | null = null;
     private readonly lambdas: NodejsFunction[] = [];
+    private lambdaRecords: Record<string, NodejsFunction> = {};
 
     public get Tables() {
         return this.dynamoTables;
@@ -39,6 +40,10 @@ export class MicroService extends Construct {
 
     public get Lambdas() {
         return this.lambdas;
+    }
+
+    public get LambdaRecords() {
+        return this.lambdaRecords;
     }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps) {
@@ -100,6 +105,8 @@ export class MicroService extends Construct {
 
         // CREATE API GATEWAY AND LAMBDA HERE 
         const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers, tables);
+
+        this.lambdaRecords = apiGateway.LambdaRecords;
 
         return {
             restApi: (gateway?.length > 0) ? gateway[0] : null,
