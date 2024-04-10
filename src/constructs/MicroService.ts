@@ -13,6 +13,7 @@ import { createSeedDatabaseCustomResource } from "../resources/customResource/cr
 import { IRestApi } from "aws-cdk-lib/aws-apigateway";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
+import { Environment } from "../config/Environments";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
@@ -46,7 +47,8 @@ export class MicroService extends Construct {
         return this.lambdaRecords;
     }
 
-    constructor(scope: Construct, id: string, props: MicroserviceProps) {
+    constructor(scope: Construct, id: string, props: MicroserviceProps,
+        env: Environment = "prod") {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
@@ -60,7 +62,7 @@ export class MicroService extends Construct {
         this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS &&
             props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
 
-        const results = this.onInit(scope);
+        const results = this.onInit(scope, env);
 
         this.api = results.restApi!;
         this.dynamoTables = results.dynamoTables!;
@@ -72,7 +74,7 @@ export class MicroService extends Construct {
         this.createTag(scope)
     }
 
-    private onInit(scope: Construct) {
+    private onInit(scope: Construct, env: Environment) {
 
         let secretManager: ISecret | null = null;
         let tables: Table[] | undefined = undefined;
@@ -104,7 +106,7 @@ export class MicroService extends Construct {
         }
 
         // CREATE API GATEWAY AND LAMBDA HERE 
-        const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], layers, tables);
+        const apiGateway = new CreateApiAndAttachLambdas(scope, this.appConfig, gateway[0], env, layers, tables);
 
         this.lambdaRecords = apiGateway.LambdaRecords;
 

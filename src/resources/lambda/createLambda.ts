@@ -15,6 +15,7 @@ import { BaseResource } from "../base/baseResource";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { LambdaHelper } from "./lambdaHelper";
 import { getUUID } from "../../helpers/util-helper";
+import { Environment } from "../../config/Environments";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
@@ -22,7 +23,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     public Lambdas: NodejsFunction[] = [];
     public LambdaRecords: Record<string, NodejsFunction> = {};
 
-    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
+    constructor(scope: Construct, config: AppConfig, private env: Environment, private layers?: LayerVersion[]) {
         super(scope, config);
 
         const resources = this.createResource(scope);
@@ -57,18 +58,18 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
     private createLambdas(config: AppConfig): NodejsFunction[] {
 
-        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers);
+        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers, this.env);
 
         return createdLambdas;
     }
 
-    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
+    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[], env: Environment = "prod") {
 
         const createdLambdas = this.config.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
 
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
-            const lambdaId = CreateLambda.getIdForLambda(config, this.config);
+            const lambdaId = CreateLambda.getIdForLambda(config, this.config, env);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
             return fctn;
@@ -171,8 +172,8 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {
-        return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
+    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig, env: Environment = "prod") {
+        return `${appConfig.AppPrefix}-${lambdaProp.name}${env === "prod" ? "" : env === "qa" ? "-qa" : "-dev"}`.toLowerCase();
     }
 
     private createRecordForLambda(lambdas: NodejsFunction[]) {

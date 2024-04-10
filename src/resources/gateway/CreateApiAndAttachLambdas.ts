@@ -13,6 +13,7 @@ import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
 import { Routes } from "../helpers/createRoutes";
+import { Environment } from "../../config/Environments";
 
 export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
@@ -33,6 +34,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     constructor(scope: Construct,
         config: AppConfig,
         private gatewayApi: IRestApi,
+        private env: Environment,
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
@@ -66,7 +68,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Lambdas
-        const lambdas = new CreateLambda(scope, this.config, this.layers);
+        const lambdas = new CreateLambda(scope, this.config, this.env, this.layers,);
         this.lambdas = lambdas.Lambdas;
         this.lambdaRecords = this.lambdaRecords;
 
