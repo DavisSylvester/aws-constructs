@@ -78,7 +78,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Routes on API Gateway for Lambdas from config
-        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
+        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, this.env, authorizer);
 
         const result: ApiLambdaResult = {
             api: this.gatewayApi,
@@ -142,11 +142,12 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     private AddRoutes(config: AppConfig,
         gateway: IRestApi,
         lambdas: NodejsFunction[],
+        env: Environment,
         authorizer?: TokenAuthorizer | RequestAuthorizer) {
 
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(prop, this.config);
+            const lambdaId = CreateLambda.getIdForLambda(prop, this.config, env);
 
             if (!lambdaId) {
                 throw new Error(`Can't find lambda`);
