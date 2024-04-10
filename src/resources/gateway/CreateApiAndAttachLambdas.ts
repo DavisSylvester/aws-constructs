@@ -147,7 +147,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 
         console.log('ENV:', env);
         console.log('API:', gateway);
-        console.log('API:', JSON.stringify(gateway));
 
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
