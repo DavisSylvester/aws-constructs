@@ -41,9 +41,9 @@ export class Routes {
                 activeResource = secondaryResource;
             }
 
-            console.log(`Route: ${prop.apiGateway.method}\t Lambda Name: ${lambdaNode.functionName}\t Path: ${activeRoutePath}`);
+            console.log(`Route: ${prop.apiGateway.method}\t Lambda Name: ${lambdaNode.node.id}\t Path: ${activeRoutePath}`);
             //  Finally, we attach our function to the last resource
-            activeResource!.addMethod(prop.apiGateway.method || 'GET',
+            activeResource?.addMethod(prop.apiGateway.method || 'GET',
                 new LambdaIntegration(lambdaNode, { proxy: true, }),
                 {
                     requestParameters: Routes.createQueryStringObject(prop.apiGateway.queryStrings),

@@ -145,6 +145,8 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         env: Environment,
         authorizer?: TokenAuthorizer | RequestAuthorizer) {
 
+        console.log('ENV:', env);
+
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
             const lambdaId = CreateLambda.getIdForLambda(prop, this.config, env);
