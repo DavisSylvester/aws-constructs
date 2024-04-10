@@ -12,7 +12,7 @@ export class Routes {
         prop: TsgLambdaProp,
         api: IRestApi,
         lambdaNode: NodejsFunction,
-        authorizer?: TokenAuthorizer|RequestAuthorizer): void {         
+        authorizer?: TokenAuthorizer | RequestAuthorizer): void {
 
         const routeMap: Map<string, Resource> = new Map();
 
@@ -20,7 +20,7 @@ export class Routes {
         let activeResource: Resource | undefined = undefined;
 
         //  Only attach lambda to an Api Gateway if a route exist
-        if (prop.apiGateway?.route) {           
+        if (prop.apiGateway?.route) {
 
             if (!prop.apiGateway.useRouteOverride) {
                 //  First we create the root resource if it doesn't exist.
@@ -41,6 +41,7 @@ export class Routes {
                 activeResource = secondaryResource;
             }
 
+            console.log(`Route: ${prop.apiGateway.method}\t Lambda Name: ${lambdaNode.functionName}\t Path: ${activeRoutePath}`);
             //  Finally, we attach our function to the last resource
             activeResource!.addMethod(prop.apiGateway.method || 'GET',
                 new LambdaIntegration(lambdaNode, { proxy: true, }),
@@ -53,7 +54,7 @@ export class Routes {
         }
     }
 
-    public static createQueryStringObject(queryStrings: string[] | undefined): { [key: string]: boolean }  {
+    public static createQueryStringObject(queryStrings: string[] | undefined): { [key: string]: boolean } {
 
         if (!queryStrings || queryStrings.length === 0) {
             return {};
@@ -63,9 +64,9 @@ export class Routes {
 
         queryStrings.forEach((qs: string) => {
             obj[`method.request.querystring.${qs}`] = true;
-          });
+        });
 
-          return obj;   
+        return obj;
     }
 
 }
