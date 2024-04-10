@@ -90,7 +90,7 @@ export class MicroService extends Construct {
             commonLayers = createCommonLayer(scope, this.appConfig);
         }
 
-        const gateway = new Api(scope, this.appConfig).APIs;
+        const gateway = new Api(scope, this.appConfig, env).APIs;
 
         const layers = commonLayers;
 

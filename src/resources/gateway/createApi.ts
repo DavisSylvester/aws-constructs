@@ -9,6 +9,8 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { BaseResource } from "../base/baseResource";
 import { CreateCertificate } from "../certificate/createCertificate";
 import { TsgApiKey } from "./createApiKey";
+import { Environment } from "../../config/Environments";
+import { environmentSuffix } from "../../helpers/util-helper";
 
 export class Api extends BaseResource<IRestApi> {
 
@@ -19,7 +21,7 @@ export class Api extends BaseResource<IRestApi> {
         return this.createdResources;
     }
 
-    constructor(scope: Construct, config: AppConfig) {
+    constructor(scope: Construct, config: AppConfig, private env: Environment = "prod") {
         super(scope, config);
 
         this.corsOptions = this.createDefaultCorsOptions();
@@ -29,12 +31,12 @@ export class Api extends BaseResource<IRestApi> {
 
     private createApi(scope: Construct) {
         if (this.config.DNS) {
-            
+
             console.log('### DNS is true ###');
 
             const zone = this.getZone(this.scope, this.config);
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(zone));
 
             this.createARecord(scope, zone, api);
 
@@ -107,7 +109,7 @@ export class Api extends BaseResource<IRestApi> {
     }
 
     private createApiKey(config: AppConfig, api: RestApi) {
-        
+
         if (this.requiresApiKey(this.config)) {
             const apiKey = new TsgApiKey(this.scope, this.config, api)
             return apiKey;
