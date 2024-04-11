@@ -46,7 +46,7 @@ export class Api extends BaseResource<IRestApi> {
 
         } else {
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps());
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps());
 
             this.createApiKey(this.config, api);
 
