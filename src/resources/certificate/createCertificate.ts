@@ -45,7 +45,7 @@ export class CreateCertificate {
   generateApiCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment) {
 
     const cert = new Certificate(scope, `${props.API.DomainPrefix}-${environmentSuffixForDomain(env)}-certificate`, {
-      domainName: `${props.API.DomainPrefix}.${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`,
+      domainName: `${props.API.DomainPrefix}${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`,
       validation: CertificateValidation.fromDnsMultiZone({
         [`${props.API.DomainPrefix}.${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`]: hostedZone
       })

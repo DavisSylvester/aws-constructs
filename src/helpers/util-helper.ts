@@ -11,5 +11,5 @@ export const environmentSuffix = (env: Environment = "prod") => {
 }
 
 export const environmentSuffixForDomain = (env: Environment = "prod") => {
-    return env === 'prod' ? '' : env === 'qa' ? 'qa' : 'dev';
+    return env === 'prod' ? '.' : env === 'qa' ? '.qa' : '.dev';
 }
