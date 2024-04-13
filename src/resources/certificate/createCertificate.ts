@@ -13,7 +13,7 @@ export class CreateCertificate {
 
   constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment = "prod") {
 
-    this.certificate = this.generateCertificate(scope, props, hostedZone);
+    // this.certificate = this.generateCertificate(scope, props, hostedZone);
 
     this.certificate = this.generateApiCertificate(scope, props, hostedZone, env);
 
