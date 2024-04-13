@@ -11,11 +11,11 @@ export class CreateCertificate {
 
   public certificate: ICertificate;
 
-  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment = "prod") {
+  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
 
     // this.certificate = this.generateCertificate(scope, props, hostedZone);
 
-    this.certificate = this.generateApiCertificate(scope, props, hostedZone, env);
+    this.certificate = this.generateApiCertificate(scope, props);
 
     this.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
@@ -35,20 +35,19 @@ export class CreateCertificate {
     return cert;
   }
 
-  generateApiCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment) {
+  generateApiCertificate(scope: Construct, props: MicroserviceProps) {
 
-    const domainName = `${props.API.DomainPrefix}${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`;
+    const hostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
+      'Z0508834Q8E4TWFVG990');
+
+    const domainName = props.DNS?.SubDomainNameForApi;
 
     console.log('domainName: ', domainName);
 
-
-    //  api.c1-.dev-certificate
-    const cert = new Certificate(scope, `${props.API.DomainPrefix}-${environmentSuffixForDomain(env)}-certificate`, {
-
-
-      domainName,
+    const cert = new Certificate(scope, `${props.DNS?.SubDomainName}-certificate`, {
+      domainName: `${props.DNS?.SubDomainNameForApi}.${props.DNS?.SubDomainName}`,
       validation: CertificateValidation.fromDnsMultiZone({
-        [domainName]: hostedZone
+        [props.DNS?.SubDomainName as string]: hostedZone
       })
     });
 

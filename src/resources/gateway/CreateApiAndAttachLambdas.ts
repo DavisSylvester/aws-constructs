@@ -13,7 +13,6 @@ import { LayerVersion } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
 import { Routes } from "../helpers/createRoutes";
-import { Environment } from "../../config/Environments";
 
 export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
 

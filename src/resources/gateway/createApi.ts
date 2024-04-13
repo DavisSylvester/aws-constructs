@@ -141,7 +141,7 @@ export class Api extends BaseResource<IRestApi> {
     }
 
     private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps) {
-        const cert = new CreateCertificate(scope, config, zone, this.env);
+        const cert = new CreateCertificate(scope, config, zone);
 
         cert.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return cert;
