@@ -1,6 +1,8 @@
 import { AuthorizationType, IRestApi, LambdaIntegration, RequestAuthorizer, Resource, TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { TsgLambdaProp } from "../../config/types";
+import { Logger } from "../../helpers/logger";
+import { logger } from "../layers/common/src/nodejs";
 
 
 export class Routes {
@@ -12,7 +14,8 @@ export class Routes {
         prop: TsgLambdaProp,
         api: IRestApi,
         lambdaNode: NodejsFunction,
-        authorizer?: TokenAuthorizer | RequestAuthorizer): void {
+        authorizer?: TokenAuthorizer | RequestAuthorizer,
+    ): void {
 
         const routeMap: Map<string, Resource> = new Map();
 
@@ -41,7 +44,7 @@ export class Routes {
                 activeResource = secondaryResource;
             }
 
-            console.log(`Route: ${prop.apiGateway.method}\t Lambda Name: ${lambdaNode.node.id}\t Path: ${activeRoutePath}`);
+            //    console.log(`Route: ${prop.apiGateway.method}\t Lambda Name: ${lambdaNode.node.id}\t Path: ${activeRoutePath}`);
             //  Finally, we attach our function to the last resource
             activeResource?.addMethod(prop.apiGateway.method || 'GET',
                 new LambdaIntegration(lambdaNode, { proxy: true, }),

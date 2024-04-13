@@ -52,7 +52,7 @@ export class LambdaHelper {
         let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
         if (lambdaId !== fctn.node.id) {
-            console.log(`can not find Lambda for : ${fctn.node.id}`);
+            console.error(`can not find Lambda for : ${fctn.node.id}`);
         }
 
         return fctn;

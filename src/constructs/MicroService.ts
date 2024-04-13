@@ -14,6 +14,7 @@ import { IRestApi } from "aws-cdk-lib/aws-apigateway";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Environment } from "../config/Environments";
+import { Logger } from "../helpers/logger";
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
@@ -52,7 +53,7 @@ export class MicroService extends Construct {
     }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps,
-        private debug: boolean = false) {
+        private logger: Logger = new Logger()) {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
@@ -114,7 +115,8 @@ export class MicroService extends Construct {
 
         this.lambdaRecords = apiGateway.LambdaRecords;
 
-        // console.log('lambda Records:', this.lambdaRecords)
+
+        this.logger.log(`lambda Records: ${this.lambdaRecords}`);
 
         return {
             restApi: (gateway?.length > 0) ? gateway[0] : null,
