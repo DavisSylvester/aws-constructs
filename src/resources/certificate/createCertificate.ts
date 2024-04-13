@@ -1,6 +1,6 @@
 import { RemovalPolicy } from "aws-cdk-lib";
 import { Certificate, CertificateValidation, DnsValidatedCertificate, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
-import { IHostedZone } from "aws-cdk-lib/aws-route53";
+import { HostedZone, IHostedZone } from "aws-cdk-lib/aws-route53";
 import { Construct } from "constructs";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { environmentSuffixForDomain } from "../../helpers/util-helper";
@@ -29,16 +29,15 @@ export class CreateCertificate {
     //     region: props.GLOBALS.region || "us-east-1"
     //   }); 
 
-    const appType = "spa-app";
+    const devHostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
+      'Z0508834Q8E4TWFVG990');
 
-    const cert = new Certificate(scope, `${props.DNS?.ZoneNameWithoutPeriod}-${appType}-certificate`, {
-      domainName: `${props.API.DomainPrefix}.${props.DNS?.ZoneName}`,
-      // subjectAlternativeNames: [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`],
+    const cert = new Certificate(scope, `api-c1-dev-api-certificate`, {
+      domainName: `c1.api.dev.convergeone.io`,
       validation: CertificateValidation.fromDnsMultiZone({
-        [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`]: hostedZone,
-      }),
+        [`dev.convergeone.io`]: devHostedZone
+      })
     });
-
     return cert;
   }
 
