@@ -40,14 +40,14 @@ export class CreateCertificate {
     const hostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
       'Z0508834Q8E4TWFVG990');
 
-    const domainName = props.DNS?.SubDomainNameForApi;
+    const domainName = `${props.DNS?.SubDomainNameForApi}.${props.DNS?.SubDomainName}`;
 
     console.log('domainName: ', domainName);
 
     const cert = new Certificate(scope, `${props.DNS?.SubDomainName}-certificate`, {
-      domainName: `${props.DNS?.SubDomainNameForApi}.${props.DNS?.SubDomainName}`,
+      domainName: domainName,
       validation: CertificateValidation.fromDnsMultiZone({
-        [props.DNS?.SubDomainName as string]: hostedZone
+        [domainName]: hostedZone
       })
     });
 

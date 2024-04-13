@@ -9,6 +9,5 @@ export class Logger {
         if (this.debug) {
             console.log(message);
         }
-
     }
 }
