@@ -3,38 +3,54 @@ import { Certificate, CertificateValidation, DnsValidatedCertificate, ICertifica
 import { IHostedZone } from "aws-cdk-lib/aws-route53";
 import { Construct } from "constructs";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
+import { environmentSuffixForDomain } from "../../helpers/util-helper";
+import { Environment } from "../../config/Environments";
 
 
 export class CreateCertificate {
 
-    public certificate: ICertificate;
+  public certificate: ICertificate;
 
-    constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
+  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment = "prod") {
 
-        this.certificate = this.generateCertificate(scope, props, hostedZone);
+    this.certificate = this.generateCertificate(scope, props, hostedZone);
 
-        this.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
-        
-    }
+    this.certificate = this.generateApiCertificate(scope, props, hostedZone, env);
 
-    generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
+    this.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
-        // const cert = new DnsValidatedCertificate(scope, `${props.DNS.ZoneNameWithoutPeriod}-spa-app-certificate`, {
-        //     domainName: `${props.API.DomainPrefix}.${props.DNS.ZoneName}`,
-        //     hostedZone,
-        //     region: props.GLOBALS.region || "us-east-1"
-        //   }); 
+  }
 
-          const appType = "spa-app";
+  generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
 
-          const cert = new Certificate(scope, `${props.DNS?.ZoneNameWithoutPeriod}-${appType}-certificate`, {
-            domainName: `${props.API.DomainPrefix}.${props.DNS?.ZoneName}`,
-            // subjectAlternativeNames: [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`],
-            validation: CertificateValidation.fromDnsMultiZone({                
-                    [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`] : hostedZone ,                
-            }),
-          });
+    // const cert = new DnsValidatedCertificate(scope, `${props.DNS.ZoneNameWithoutPeriod}-spa-app-certificate`, {
+    //     domainName: `${props.API.DomainPrefix}.${props.DNS.ZoneName}`,
+    //     hostedZone,
+    //     region: props.GLOBALS.region || "us-east-1"
+    //   }); 
 
-          return cert;
-    }
+    const appType = "spa-app";
+
+    const cert = new Certificate(scope, `${props.DNS?.ZoneNameWithoutPeriod}-${appType}-certificate`, {
+      domainName: `${props.API.DomainPrefix}.${props.DNS?.ZoneName}`,
+      // subjectAlternativeNames: [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`],
+      validation: CertificateValidation.fromDnsMultiZone({
+        [`${props.API.DomainPrefix}.${props.DNS?.ZoneName}`]: hostedZone,
+      }),
+    });
+
+    return cert;
+  }
+
+  generateApiCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: Environment) {
+
+    const cert = new Certificate(scope, `${props.API.DomainPrefix}-${environmentSuffixForDomain(env)}-certificate`, {
+      domainName: `${props.API.DomainPrefix}.${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`,
+      validation: CertificateValidation.fromDnsMultiZone({
+        [`${props.API.DomainPrefix}.${environmentSuffixForDomain(env)}.${props.DNS?.ZoneName}`]: hostedZone
+      })
+    });
+
+    return cert;
+  }
 }

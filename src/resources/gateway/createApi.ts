@@ -36,7 +36,7 @@ export class Api extends BaseResource<IRestApi> {
 
             const zone = this.getZone(this.scope, this.config);
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(zone));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(this.env, zone));
 
             this.createARecord(scope, zone, api);
 
@@ -46,7 +46,7 @@ export class Api extends BaseResource<IRestApi> {
 
         } else {
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps());
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(this.env));
 
             this.createApiKey(this.config, api);
 
@@ -54,7 +54,7 @@ export class Api extends BaseResource<IRestApi> {
         }
     }
 
-    private createApiProps(zone?: IHostedZone): RestApiProps {
+    private createApiProps(env: Environment, zone?: IHostedZone,): RestApiProps {
 
         if (this.config.DNS) {
 
@@ -64,7 +64,7 @@ export class Api extends BaseResource<IRestApi> {
                 restApiName: `${this.config.AppPrefix}-${this.config.API.Name}`,
                 description: this.config.API.Description,
                 domainName: {
-                    domainName: `${this.config.API.DomainPrefix}.${this.config.DNS.ZoneName}`,
+                    domainName: `${this.config.API.DomainPrefix}.${env}.${this.config.DNS.ZoneName}`,
                     certificate: cert.certificate,
                     endpointType: EndpointType.EDGE,
                     securityPolicy: SecurityPolicy.TLS_1_2
@@ -141,7 +141,9 @@ export class Api extends BaseResource<IRestApi> {
     }
 
     private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps) {
-        const cert = new CreateCertificate(scope, config, zone);
+        const cert = new CreateCertificate(scope, config, zone, this.env);
+
+        cert.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return cert;
     }
 
