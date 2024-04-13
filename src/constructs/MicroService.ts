@@ -47,6 +47,10 @@ export class MicroService extends Construct {
         return this.lambdaRecords;
     }
 
+    public get RestApi() {
+        return this.api;
+    }
+
     constructor(scope: Construct, id: string, props: MicroserviceProps,
         env: Environment = "prod") {
         super(scope, id);
