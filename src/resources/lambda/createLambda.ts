@@ -23,7 +23,7 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     public Lambdas: NodejsFunction[] = [];
     public LambdaRecords: Record<string, NodejsFunction> = {};
 
-    constructor(scope: Construct, config: AppConfig, private env: Environment, private layers?: LayerVersion[]) {
+    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
         super(scope, config);
 
         const resources = this.createResource(scope);
@@ -58,18 +58,18 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
     private createLambdas(config: AppConfig): NodejsFunction[] {
 
-        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers, this.env);
+        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers);
 
         return createdLambdas;
     }
 
-    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[], env: Environment = "prod") {
+    private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
 
         const createdLambdas = this.config.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
 
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
-            const lambdaId = CreateLambda.getIdForLambda(config, this.config, env);
+            const lambdaId = CreateLambda.getIdForLambda(config, this.config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
 
             return fctn;
@@ -172,8 +172,8 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig, env: Environment = "prod") {
-        return `${appConfig.AppPrefix}-${lambdaProp.name}${env === "prod" ? "" : env === "qa" ? "-qa" : "-dev"}`.toLowerCase();
+    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {
+        return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
     }
 
     private createRecordForLambda(lambdas: NodejsFunction[]) {

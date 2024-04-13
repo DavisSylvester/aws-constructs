@@ -23,12 +23,6 @@ export class CreateCertificate {
 
   generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
 
-    // const cert = new DnsValidatedCertificate(scope, `${props.DNS.ZoneNameWithoutPeriod}-spa-app-certificate`, {
-    //     domainName: `${props.API.DomainPrefix}.${props.DNS.ZoneName}`,
-    //     hostedZone,
-    //     region: props.GLOBALS.region || "us-east-1"
-    //   }); 
-
     const devHostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
       'Z0508834Q8E4TWFVG990');
 

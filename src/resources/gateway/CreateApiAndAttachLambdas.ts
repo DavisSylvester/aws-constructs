@@ -34,7 +34,6 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     constructor(scope: Construct,
         config: AppConfig,
         private gatewayApi: IRestApi,
-        private env: Environment,
         private layers?: LayerVersion[],
         private tables?: ITable[]) {
         super(scope, config);
@@ -68,7 +67,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Lambdas
-        const lambdas = new CreateLambda(scope, this.config, this.env, this.layers,);
+        const lambdas = new CreateLambda(scope, this.config, this.layers);
         this.lambdas = lambdas.Lambdas;
         this.lambdaRecords = this.lambdaRecords;
 
@@ -78,7 +77,7 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
         }
 
         // Create Routes on API Gateway for Lambdas from config
-        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, this.env, authorizer);
+        this.AddRoutes(this.config, this.gatewayApi, lambdas.Lambdas, authorizer);
 
         const result: ApiLambdaResult = {
             api: this.gatewayApi,
@@ -142,15 +141,12 @@ export class CreateApiAndAttachLambdas extends BaseResource<ApiLambdaResult> {
     private AddRoutes(config: AppConfig,
         gateway: IRestApi,
         lambdas: NodejsFunction[],
-        env: Environment,
         authorizer?: TokenAuthorizer | RequestAuthorizer) {
 
-        console.log('ENV:', env);
-        console.log('API:', gateway);
 
         config.RESOURCES.LAMBDA?.forEach((prop: TsgLambdaProp) => {
 
-            const lambdaId = CreateLambda.getIdForLambda(prop, this.config, env);
+            const lambdaId = CreateLambda.getIdForLambda(prop, this.config);
 
             if (!lambdaId) {
                 throw new Error(`Can't find lambda`);
