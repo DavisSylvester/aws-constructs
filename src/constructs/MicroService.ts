@@ -52,7 +52,7 @@ export class MicroService extends Construct {
     }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps,
-        env: Environment = "prod") {
+        private debug: boolean = false) {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
@@ -66,7 +66,7 @@ export class MicroService extends Construct {
         this.hasLambdaLayers = (props.RESOURCES.LAMBDA_LAYERS &&
             props.RESOURCES.LAMBDA_LAYERS.length > 0) ? true : false;
 
-        const results = this.onInit(scope, env);
+        const results = this.onInit(scope);
 
         this.api = results.restApi!;
         this.dynamoTables = results.dynamoTables!;
@@ -78,7 +78,7 @@ export class MicroService extends Construct {
         this.createTag(scope)
     }
 
-    private onInit(scope: Construct, env: Environment) {
+    private onInit(scope: Construct) {
 
         let secretManager: ISecret | null = null;
         let tables: Table[] | undefined = undefined;
@@ -94,7 +94,7 @@ export class MicroService extends Construct {
             commonLayers = createCommonLayer(scope, this.appConfig);
         }
 
-        const gateway = new Api(scope, this.appConfig, env).APIs;
+        const gateway = new Api(scope, this.appConfig).APIs;
 
         const layers = commonLayers;
 

@@ -21,7 +21,7 @@ export class Api extends BaseResource<IRestApi> {
         return this.createdResources;
     }
 
-    constructor(scope: Construct, config: AppConfig, private env: Environment = "prod") {
+    constructor(scope: Construct, config: AppConfig) {
         super(scope, config);
 
         this.corsOptions = this.createDefaultCorsOptions();
@@ -36,7 +36,7 @@ export class Api extends BaseResource<IRestApi> {
 
             const zone = this.getZone(this.scope, this.config);
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(this.env, zone));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone));
 
             this.createARecord(scope, zone, api);
 
@@ -46,7 +46,7 @@ export class Api extends BaseResource<IRestApi> {
 
         } else {
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api${environmentSuffix(this.env)}`, this.createApiProps(this.env));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api-without-DNS`, this.createApiProps());
 
             this.createApiKey(this.config, api);
 
@@ -54,7 +54,7 @@ export class Api extends BaseResource<IRestApi> {
         }
     }
 
-    private createApiProps(env: Environment, zone?: IHostedZone,): RestApiProps {
+    private createApiProps(zone?: IHostedZone): RestApiProps {
 
         if (this.config.DNS) {
 
@@ -64,7 +64,7 @@ export class Api extends BaseResource<IRestApi> {
                 restApiName: `${this.config.AppPrefix}-${this.config.API.Name}`,
                 description: this.config.API.Description,
                 domainName: {
-                    domainName: `${this.config.API.DomainPrefix}.${env}.${this.config.DNS.ZoneName}`,
+                    domainName: `${this.config.DNS.SubDomainNameForApi}.${this.config.DNS.SubDomainName}`,
                     certificate: cert.certificate,
                     endpointType: EndpointType.EDGE,
                     securityPolicy: SecurityPolicy.TLS_1_2
