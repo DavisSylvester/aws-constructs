@@ -5,6 +5,7 @@ import { Construct } from "constructs";
 import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { environmentSuffixForDomain } from "../../helpers/util-helper";
 import { Environment } from "../../config/Environments";
+import { env } from "process";
 
 
 export class CreateCertificate {
@@ -45,9 +46,11 @@ export class CreateCertificate {
     console.log('domainName: ', domainName);
 
     const cert = new Certificate(scope, `${props.DNS?.SubDomainName}-certificate`, {
+      certificateName: `${domainName}-certificate`,
       domainName: domainName,
       validation: CertificateValidation.fromDnsMultiZone({
-        [domainName]: hostedZone
+        domainName: hostedZone
+
       })
     });
 
