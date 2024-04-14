@@ -142,7 +142,7 @@ export class Api extends BaseResource<IRestApi> {
     private createCnameRecord(scope: Construct, zone: IHostedZone, api: RestApi, config: AppConfig) {
         const record = new CnameRecord(scope, "api-cname-record", {
             zone,
-            domainName: api.url!,
+            domainName: api.domainName?.domainNameAliasDomainName!,
             recordName: `${config?.DNS?.SubDomainNameForApi}.${config?.DNS?.SubDomainName}`
         });
         return record;
