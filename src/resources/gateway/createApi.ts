@@ -66,7 +66,7 @@ export class Api extends BaseResource<IRestApi> {
                 domainName: {
                     domainName: `${this.config.DNS.SubDomainNameForApi}.${this.config.DNS.SubDomainName}`,
                     certificate: cert.certificate,
-                    endpointType: EndpointType.EDGE,
+                    endpointType: EndpointType.REGIONAL,
                     securityPolicy: SecurityPolicy.TLS_1_2
                 },
                 // TODO:  ADD CUSTOM DOMAIN HERE
