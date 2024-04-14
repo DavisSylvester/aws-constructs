@@ -43,13 +43,11 @@ export class CreateCertificate {
 
     const domainName = `${props.DNS?.SubDomainNameForApi}.${props.DNS?.SubDomainName}`;
 
-    console.log('domainName: ', domainName);
-
     const cert = new Certificate(scope, `${props.DNS?.SubDomainName}-certificate`, {
       certificateName: `${domainName}-certificate`,
       domainName: domainName,
       validation: CertificateValidation.fromDnsMultiZone({
-        domainName: hostedZone
+        [`${props.DNS?.SubDomainName}`]: hostedZone
 
       })
     });
