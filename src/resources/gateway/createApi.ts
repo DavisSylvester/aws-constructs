@@ -1,6 +1,6 @@
 import { CfnOutput, RemovalPolicy, Tag } from "aws-cdk-lib";
 import { BasePathMapping, Cors, CorsOptions, DomainName, EndpointType, IDomainName, IRestApi, MethodOptions, RestApi, RestApiProps, SecurityPolicy } from "aws-cdk-lib/aws-apigateway";
-import { ARecord, HostedZone, IHostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
+import { ARecord, CnameRecord, HostedZone, IHostedZone, RecordTarget } from "aws-cdk-lib/aws-route53";
 import { ApiGateway, ApiGatewayDomain } from "aws-cdk-lib/aws-route53-targets";
 import { Construct } from "constructs";
 import { AppConfig } from "../../config/AppConfig";
@@ -38,7 +38,9 @@ export class Api extends BaseResource<IRestApi> {
 
             const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone));
 
-            this.createARecord(scope, zone, api);
+            // this.createARecord(scope, zone, api);
+
+            this.createCnameRecord(scope, zone, api, this.config);
 
             this.createApiKey(this.config, api);
 
@@ -69,11 +71,6 @@ export class Api extends BaseResource<IRestApi> {
                     endpointType: EndpointType.REGIONAL,
                     securityPolicy: SecurityPolicy.TLS_1_2
                 },
-                // TODO:  ADD CUSTOM DOMAIN HERE
-                // defaultDomainMapping: {
-                //     domainName: domain,            
-                //   },
-                // domainName: '',
                 defaultCorsPreflightOptions: this.corsOptions
             };
 
@@ -116,22 +113,6 @@ export class Api extends BaseResource<IRestApi> {
         }
         return null;
     }
-    // private createCustomDomain(scope: Construct, config: MicroserviceProps) {
-    //     const domainName = DomainName.fromDomainNameAttributes(scope, `${config.API.Name}-custom-domain`, {
-    //         domainName: config.DNS?.ZoneName,
-    //         domainNameAliasHostedZoneId: config.DNS.ZoneId!,
-    //         domainNameAliasTarget: config.API.DomainPrefix!,
-    //     });
-
-    //     return domainName
-    // }
-
-    // private attachDomainToApi(scope: Construct, api: IRestApi, domain: IDomainName, config: MicroserviceProps) {
-    //     return new BasePathMapping(scope, `${config.API.Name}-basePathMapping`, {
-    //         domainName: domain,
-    //         restApi: api,
-    //     });
-    // }
 
     private getZone(scope: Construct, config: MicroserviceProps) {
         return HostedZone.fromHostedZoneAttributes(scope, `${config.DNS?.ZoneName}-zone`, {
@@ -156,6 +137,15 @@ export class Api extends BaseResource<IRestApi> {
 
         aRecord.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return aRecord;
+    }
+
+    private createCnameRecord(scope: Construct, zone: IHostedZone, api: RestApi, config: AppConfig) {
+        const record = new CnameRecord(scope, "api-cname-record", {
+            zone,
+            domainName: api.url!,
+            recordName: `${config?.DNS?.SubDomainNameForApi}.${config?.DNS?.SubDomainName}`
+        });
+        return record;
     }
 
     protected createResource(scope: Construct) {
