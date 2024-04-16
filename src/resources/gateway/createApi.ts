@@ -21,7 +21,7 @@ export class Api extends BaseResource<IRestApi> {
         return this.createdResources;
     }
 
-    constructor(scope: Construct, config: AppConfig) {
+    constructor(scope: Construct, config: AppConfig, env: string = "prod") {
         super(scope, config);
 
         this.corsOptions = this.createDefaultCorsOptions();
@@ -29,18 +29,18 @@ export class Api extends BaseResource<IRestApi> {
         this.createdResources = this.createResource(scope);
     }
 
-    private createApi(scope: Construct) {
+    private createApi(scope: Construct, env: string = "prod") {
         if (this.config.DNS) {
 
             // console.log('### DNS is true ###');
 
             const zone = this.getZone(this.scope, this.config);
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone, env));
 
-            // this.createARecord(scope, zone, api);
+            this.createARecord(scope, zone, api);
 
-            this.createCnameRecord(scope, zone, api, this.config);
+            // this.createCnameRecord(scope, zone, api, this.config);
 
             this.createApiKey(this.config, api);
 
@@ -56,11 +56,11 @@ export class Api extends BaseResource<IRestApi> {
         }
     }
 
-    private createApiProps(zone?: IHostedZone): RestApiProps {
+    private createApiProps(zone?: IHostedZone, env: string = "prod"): RestApiProps {
 
         if (this.config.DNS) {
 
-            const cert = this.createCertificate(this.scope, zone!, this.config);
+            const cert = this.createCertificate(this.scope, zone!, this.config, env);
 
             const props: RestApiProps = {
                 restApiName: `${this.config.AppPrefix}-${this.config.API.Name}`,
@@ -121,15 +121,15 @@ export class Api extends BaseResource<IRestApi> {
         });
     }
 
-    private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps) {
-        const cert = new CreateCertificate(scope, config, zone);
+    private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps, env: string = "prod") {
+        const cert = new CreateCertificate(scope, config, zone, env);
 
         cert.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
         return cert;
     }
 
     private createARecord(scope: Construct, zone: IHostedZone, api: RestApi) {
-        const aRecord = new ARecord(scope, "ApiRecord", {
+        const aRecord = new ARecord(scope, `api-dns-a-record-${this.config.API.DomainPrefix}`, {
             zone,
             target: RecordTarget.fromAlias(new ApiGateway(api)),
             recordName: this.config.API.DomainPrefix

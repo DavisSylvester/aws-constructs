@@ -12,17 +12,17 @@ export class CreateCertificate {
 
   public certificate: ICertificate;
 
-  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
+  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string = "prod") {
 
     // this.certificate = this.generateCertificate(scope, props, hostedZone);
 
-    this.certificate = this.generateApiCertificate(scope, props);
+    this.certificate = this.generateApiCertificate(scope, props, env);
 
     this.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
 
   }
 
-  generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone) {
+  generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string = "prod") {
 
     const devHostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
       'Z0508834Q8E4TWFVG990');
@@ -36,18 +36,18 @@ export class CreateCertificate {
     return cert;
   }
 
-  generateApiCertificate(scope: Construct, props: MicroserviceProps) {
+  generateApiCertificate(scope: Construct, props: MicroserviceProps, env: string = "prod") {
 
-    const hostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
-      'Z0508834Q8E4TWFVG990');
+    const hostedZone = HostedZone.fromHostedZoneId(scope, `${props.API.DomainPrefix}-${env}-${props.DNS?.ZoneName}-hosted-zone`,
+      props.DNS?.ZoneId!);
 
-    const domainName = `${props.DNS?.SubDomainNameForApi}.${props.DNS?.SubDomainName}`;
+    const domainName = `${props.API.DomainPrefix}.${env}.${props.DNS?.ZoneName}`;
 
-    const cert = new Certificate(scope, `${props.DNS?.SubDomainName}-certificate`, {
+    const cert = new Certificate(scope, `${props.API.DomainPrefix}-${env}-${props.DNS?.ZoneName}-certificate`, {
       certificateName: `${domainName}-certificate`,
       domainName: domainName,
       validation: CertificateValidation.fromDnsMultiZone({
-        [`${props.DNS?.SubDomainName}`]: hostedZone
+        [`${env}.${props.DNS?.ZoneName}`]: hostedZone
 
       })
     });

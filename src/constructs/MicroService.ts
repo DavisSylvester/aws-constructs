@@ -53,7 +53,7 @@ export class MicroService extends Construct {
     }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps,
-        private logger: Logger = new Logger()) {
+        private logger: Logger = new Logger(), private env: string) {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
@@ -95,7 +95,7 @@ export class MicroService extends Construct {
             commonLayers = createCommonLayer(scope, this.appConfig);
         }
 
-        const gateway = new Api(scope, this.appConfig).APIs;
+        const gateway = new Api(scope, this.appConfig, this.env).APIs;
 
         const layers = commonLayers;
 
