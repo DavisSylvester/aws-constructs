@@ -53,7 +53,7 @@ export class MicroService extends Construct {
     }
 
     constructor(scope: Construct, id: string, props: MicroserviceProps,
-        private logger: Logger = new Logger(), private env: string) {
+        private env: string) {
         super(scope, id);
 
         this.appConfig = new AppConfig(props);
