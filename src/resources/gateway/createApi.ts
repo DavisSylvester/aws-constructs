@@ -9,8 +9,7 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { BaseResource } from "../base/baseResource";
 import { CreateCertificate } from "../certificate/createCertificate";
 import { TsgApiKey } from "./createApiKey";
-import { Environment } from "../../config/Environments";
-import { environmentSuffix } from "../../helpers/util-helper";
+
 
 export class Api extends BaseResource<IRestApi> {
 
@@ -21,7 +20,7 @@ export class Api extends BaseResource<IRestApi> {
         return this.createdResources;
     }
 
-    constructor(scope: Construct, config: AppConfig, env: string = "prod") {
+    constructor(scope: Construct, config: AppConfig, private env: string) {
         super(scope, config);
 
         this.corsOptions = this.createDefaultCorsOptions();
@@ -29,14 +28,14 @@ export class Api extends BaseResource<IRestApi> {
         this.createdResources = this.createResource(scope);
     }
 
-    private createApi(scope: Construct, env: string = "prod") {
+    private createApi(scope: Construct, env: string) {
         if (this.config.DNS) {
 
             // console.log('### DNS is true ###');
 
             const zone = this.getZone(this.scope, this.config);
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(zone, env));
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api`, this.createApiProps(env, zone));
 
             this.createARecord(scope, zone, api);
 
@@ -48,7 +47,7 @@ export class Api extends BaseResource<IRestApi> {
 
         } else {
 
-            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api-without-DNS`, this.createApiProps());
+            const api = new RestApi(this.scope, `${this.config.AppPrefix}-rest-api-without-DNS`, this.createApiProps(env));
 
             this.createApiKey(this.config, api);
 
@@ -56,7 +55,7 @@ export class Api extends BaseResource<IRestApi> {
         }
     }
 
-    private createApiProps(zone?: IHostedZone, env: string = "prod"): RestApiProps {
+    private createApiProps(env: string, zone?: IHostedZone,): RestApiProps {
 
         if (this.config.DNS) {
 
@@ -121,7 +120,8 @@ export class Api extends BaseResource<IRestApi> {
         });
     }
 
-    private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps, env: string = "prod") {
+    private createCertificate(scope: Construct, zone: IHostedZone, config: MicroserviceProps,
+        env: string) {
         const cert = new CreateCertificate(scope, config, zone, env);
 
         cert.certificate.applyRemovalPolicy(RemovalPolicy.DESTROY);
@@ -150,7 +150,7 @@ export class Api extends BaseResource<IRestApi> {
 
     protected createResource(scope: Construct) {
 
-        const api = this.createApi(scope);
+        const api = this.createApi(scope, this.env);
         // TODO:  ONLY IF CUSTOM MAPPING IS REQUIRED
         // const domain = this.createCustomDomain(scope, this.config);
 

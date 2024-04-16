@@ -12,7 +12,7 @@ export class CreateCertificate {
 
   public certificate: ICertificate;
 
-  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string = "prod") {
+  constructor(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string) {
 
     // this.certificate = this.generateCertificate(scope, props, hostedZone);
 
@@ -22,7 +22,7 @@ export class CreateCertificate {
 
   }
 
-  generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string = "prod") {
+  generateCertificate(scope: Construct, props: MicroserviceProps, hostedZone: IHostedZone, env: string) {
 
     const devHostedZone = HostedZone.fromHostedZoneId(scope, `api.c1.dev.convergeone.io-hosted-zone`,
       'Z0508834Q8E4TWFVG990');
@@ -36,7 +36,7 @@ export class CreateCertificate {
     return cert;
   }
 
-  generateApiCertificate(scope: Construct, props: MicroserviceProps, env: string = "prod") {
+  generateApiCertificate(scope: Construct, props: MicroserviceProps, env: string) {
 
     const hostedZone = HostedZone.fromHostedZoneId(scope, `${props.API.DomainPrefix}-${env}-${props.DNS?.ZoneName}-hosted-zone`,
       props.DNS?.ZoneId!);
