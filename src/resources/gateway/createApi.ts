@@ -132,7 +132,7 @@ export class Api extends BaseResource<IRestApi> {
         const aRecord = new ARecord(scope, `api-dns-a-record-${this.config.API.DomainPrefix}`, {
             zone,
             target: RecordTarget.fromAlias(new ApiGateway(api)),
-            recordName: this.config.API.DomainPrefix
+            recordName: `${this.config.API.DomainPrefix}.${this.env}.${this.config.DNS?.ZoneName}`
         });
 
         aRecord.applyRemovalPolicy(RemovalPolicy.DESTROY);
