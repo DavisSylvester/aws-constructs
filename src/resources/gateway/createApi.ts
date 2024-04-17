@@ -55,7 +55,7 @@ export class Api extends BaseResource<IRestApi> {
         }
     }
 
-    private createApiProps(env: string, zone?: IHostedZone,): RestApiProps {
+    private createApiProps(env: string, zone?: IHostedZone): RestApiProps {
 
         if (this.config.DNS) {
 
@@ -65,7 +65,7 @@ export class Api extends BaseResource<IRestApi> {
                 restApiName: `${this.config.AppPrefix}-${this.config.API.Name}`,
                 description: this.config.API.Description,
                 domainName: {
-                    domainName: `${this.config.DNS.SubDomainNameForApi}.${this.config.DNS.SubDomainName}`,
+                    domainName: `${this.config.API.DomainPrefix}.${env}.${this.config.DNS.ZoneName}`,
                     certificate: cert.certificate,
                     endpointType: EndpointType.REGIONAL,
                     securityPolicy: SecurityPolicy.TLS_1_2

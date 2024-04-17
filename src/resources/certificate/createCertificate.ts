@@ -47,7 +47,7 @@ export class CreateCertificate {
       certificateName: `${domainName}-certificate`,
       domainName: domainName,
       validation: CertificateValidation.fromDnsMultiZone({
-        [`${env}.${props.DNS?.ZoneName}`]: hostedZone
+        [`${props.API.DomainPrefix}.${env}.${props.DNS?.ZoneName}`]: hostedZone
 
       })
     });
