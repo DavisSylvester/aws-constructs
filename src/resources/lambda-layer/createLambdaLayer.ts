@@ -31,7 +31,7 @@ const baseLayerProps = (prop: MicroserviceProps, desc: string) => {
 
     const baseLayerProps: LayerVersionProps = {
         code: Code.fromAsset(path.join(''),),
-        compatibleRuntimes: [prop.GLOBALS.stackRuntime],
+        compatibleRuntimes: [prop.GLOBALS.stackRuntime, Runtime.NODEJS_LATEST, Runtime.NODEJS_16_X],
         license: 'Apache-2.0',
         description: desc,
     };

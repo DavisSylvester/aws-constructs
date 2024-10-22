@@ -66,6 +66,19 @@ export class AppConfig implements IAppConfig {
                 ...config.DNS!
             };
         }
+
+        if (config.RESOURCES.AUTHORIZER) {
+            this.RESOURCES.AUTHORIZER = {
+                ...config.RESOURCES.AUTHORIZER
+            };
+        }
+
+        if (config.RESOURCES.EC2) {
+            this.RESOURCES.EC2 = {
+                ...config.RESOURCES.EC2
+            };
+        }
+
     }
     //     this.lambdaConfigs = this.expandProps<TsgLambdaName, TsgLambdaProp>(this.RESOURCES.LAMBDA!);
     //     this.dynamoConfigs = this.expandProps<TsgTableName, TsgDynamoProp>(this.RESOURCES.DYNAMO?.TABLES!);

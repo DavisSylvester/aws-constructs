@@ -38,8 +38,7 @@ export const config: IAppConfig = {
                 }
             },
         ],
-
-
+        
         DYNAMO: {
             TABLES: [
                 {

@@ -52,7 +52,7 @@ export class CreateDynamoDb extends BaseResource<Table> {
                 this.config.RESOURCES.DYNAMO?.TABLES?.[idx].indexes.map((gsi) => {
 
                     const gsiProps: GlobalSecondaryIndexProps = {
-                        indexName: this.generateDbName(gsi.indexName),
+                        indexName: gsi.indexName,
                         partitionKey: gsi.partitionKey,
                         sortKey: gsi.sortKey,
                         projectionType: gsi.projectionType

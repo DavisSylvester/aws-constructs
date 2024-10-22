@@ -12,29 +12,37 @@ import { TsgLambdaProp } from "../../config/types";
 import { TsgLambdaProps } from "../../config/types/TsgLambdaProps";
 import { CreateLambdaFunctionInput } from "../../interfaces/CreateLambdaFunctionInput";
 import { BaseResource } from "../base/baseResource";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { LambdaHelper } from "./lambdaHelper";
+import { getUUID } from "../../helpers/util-helper";
+import { Environment } from "../../config/Environments";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
 
     public Lambdas: NodejsFunction[] = [];
-    
+    public LambdaRecords: Record<string, NodejsFunction> = {};
 
-    constructor(private props: TsgLambdaProps, config: AppConfig) {
-        super(props.scope, config);
+    constructor(scope: Construct, config: AppConfig, private layers?: LayerVersion[]) {
+        super(scope, config);
 
-        const resources = this.createResource(props.scope);
+        const resources = this.createResource(scope);
+
+        this.createdResources = [...resources];
 
         this.Lambdas = [...resources];
 
         this.createAlarmsForLambdas(this.Lambdas);
-        
-        this.createOutput(props.scope, resources);
+
+        this.LambdaRecords = this.createRecordForLambda(this.Lambdas);
+
+        this.createOutput(scope, resources);
     }
 
     protected createResource(scope: Construct): NodejsFunction[] {
 
-        const result = this.createLambdas(this.props);
-        
+        const result = this.createLambdas(this.config);
+
         return result;
     }
 
@@ -48,32 +56,21 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
         });
     }
 
-    private createLambdas(props: TsgLambdaProps): NodejsFunction[] {
-        
-        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, props.role, props.layers);
+    private createLambdas(config: AppConfig): NodejsFunction[] {
+
+        const createdLambdas: NodejsFunction[] = this.createLambdaFunctions(this.scope, undefined, this.layers);
 
         return createdLambdas;
     }
 
     private createLambdaFunctions(scope: Construct, role?: IRole, layers?: LayerVersion[]) {
-        
-        const createdLambdas = this.props.prop.RESOURCES.LAMBDA.map((config:TsgLambdaProp) => {
-            
+
+        const createdLambdas = this.config.RESOURCES.LAMBDA.map((config: TsgLambdaProp) => {
+
             let lambdaProps = this.createLambdaProps(config, role, layers);
 
             const lambdaId = CreateLambda.getIdForLambda(config, this.config);
             let fctn = new NodejsFunction(scope, lambdaId, lambdaProps);
-
-            if (lambdaId === fctn.node.id) {
-                console.log(`found Lambda for : ${fctn.node.id}`);
-            }
-
-            
-            //  If we have managed policies, we add them.
-            if (config.managedPolicies && config.managedPolicies?.length > 0) {
-                
-                this.assignManagedPolicies(fctn, config.managedPolicies);
-            }
 
             return fctn;
         });
@@ -84,9 +81,9 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     private createLambdaProps(prop: TsgLambdaProp, role?: IRole, layers?: LayerVersion[], props?: TsgLambdaProps) {
 
         return this.createLambdaFunctionProps({
-            prop, 
+            prop,
             role,
-            layers, 
+            layers,
             props
         });
     }
@@ -94,17 +91,16 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
     private createLambdaFunctionProps(props: CreateLambdaFunctionInput) {
         const { prop, role, layers } = props;
 
-        console.log(`function Name: ${this.props.appConfig.AppPrefix}-${prop.name}`);
-
         const lambdaProp: NodejsFunctionProps = {
             entry: path.join(prop.codePath),
-            functionName: `${this.props.appConfig.AppPrefix}-${prop.name}`,
+            functionName: `${this.config.AppPrefix}-${prop.name}`,
             handler: prop.handler,
+            logRetention: (!prop.logDuration) ? RetentionDays.FIVE_DAYS : LambdaHelper.getDayToSaveLogs(prop.logDuration),
             runtime: prop.runtime || this.config.GLOBALS.stackRuntime,
             timeout: prop.duration || Duration.minutes(2),
             memorySize: prop.memory || 512,
             environment: {
-                "VERBOSE_LOGGING": "true",                
+                "VERBOSE_LOGGING": "true",
                 ...prop.environment
             },
             bundling: {
@@ -115,75 +111,90 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
                 environment: prop.environment || prop.environment,
             },
             role,
-            //layers
+            layers
 
         }
 
-        
         return lambdaProp;
     };
 
-    private assignManagedPolicies(lambda: NodejsFunction, managedPolicyNames: string[]) {
+    private createAlarmsForLambdas(lambdas: NodejsFunction[]) {
 
-        managedPolicyNames.forEach((managedPolicyName: string) => {
+        const lambdaRecords = this.createRecordForLambda(lambdas);
 
-            let policy = ManagedPolicy.fromAwsManagedPolicyName(managedPolicyName);
-
-            lambda.role?.addManagedPolicy(policy);
-        });
-
-    }
-
-    private createAlarmsForLambdas(lambdas: NodejsFunction[]) {        
+        // console.log('Lambda Records:', lambdaRecords);
+        // const lambdaNames = Object.keys(lambdaRecords);
+        // console.log('lambda Names from Records', lambdaNames);
 
         lambdas.forEach((lambda, idx) => {
 
             const errorMetric = lambda.metricErrors({
                 period: Duration.minutes(3),
-                
+
             });
 
             const durationMetric = lambda.metricDuration({
-                period: Duration.minutes(3),                
+                period: Duration.minutes(3),
             });
 
             const invocationMetric = lambda.metricInvocations({
-                period: Duration.minutes(3),                
+                period: Duration.minutes(3),
             });
 
-            new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-error-alarm`, {
-                metric: errorMetric, 
+            const uuid = getUUID().split('-')[0];
+
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-error-alarm`, {
+                metric: errorMetric,
                 threshold: 5,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-error-alarm`
+                alarmDescription: `${this.config.AppPrefix} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-error-alarm`
             });
 
-            new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-duration-alarm`, {
-                metric: durationMetric, 
+            new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-duration-alarm`, {
+                metric: durationMetric,
                 threshold: 1,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} duration errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-duration-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.node.id} duration errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-duration-alarm`
             });
 
-            const invocationAlarm = new Alarm(this.props.scope, `${this.config.AppPrefix}-${idx}-invocation-alarm`, {
-                metric: errorMetric, 
+            const invocationAlarm = new Alarm(this.scope, `${this.config.AppPrefix}-${lambda.node.id}-invocation-alarm`, {
+                metric: errorMetric,
                 threshold: 1000,
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
                 evaluationPeriods: 3,
-                alarmDescription: `${this.config.AppPrefix}-${idx} errors over 3 min period`,
-                alarmName: `${this.config.AppPrefix}-${idx}-invocation-Metric-alarm`
+                alarmDescription: `${this.config.AppPrefix}-${lambda.node.id} errors over 3 min period`,
+                alarmName: `${this.config.AppPrefix}-${lambda.node.id}-invocation-Metric-alarm`
             });
-
-            // const alarmAction: IAlarmAction = {};
-            // invocationAlarm.addAlarmAction(alarmAction);
         });
     }
 
-    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {       
+    public static getIdForLambda(lambdaProp: TsgLambdaProp, appConfig: AppConfig) {
         return `${appConfig.AppPrefix}-${lambdaProp.name}`.toLowerCase();
     }
+
+    private createRecordForLambda(lambdas: NodejsFunction[]) {
+
+        const names = this.config.RESOURCES.LAMBDA.map((lambda) => {
+            return lambda.name;
+        });
+
+        const lambdaNames = [...names] as const;
+
+        type LambdaName = typeof lambdaNames[number];
+
+
+        const lambdaRecord: Record<LambdaName, NodejsFunction> = {} as Record<LambdaName, NodejsFunction>;
+
+        lambdas.forEach((lambda, idx) => {
+            lambdaRecord[lambdaNames[idx] as LambdaName] = lambdas[idx];
+        });
+
+        return lambdaRecord;
+    }
 }
+
+

@@ -11,13 +11,13 @@ import { MicroserviceProps } from "../../interfaces/MicroserviceProps";
 import { BaseResource } from "../base/baseResource";
 import { CreateLambda } from "../lambda/createLambda";
 
-export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
+export class TsgJwtTokenAuthorizer extends BaseResource<TokenAuthorizer> {
 
     get JwtAuthorizer() {
         return this.createdResources[0];
     }
 
-    constructor(scope: Construct, props: AppConfig, protected authProps: TsgLambdaProp) {
+    constructor(scope: Construct, props: AppConfig) {
 
         super(scope, props);
 
@@ -30,7 +30,7 @@ export class CreateAuthorizer extends BaseResource<TokenAuthorizer> {
     }
 
     protected createResource(scope: Construct): TokenAuthorizer[] | null {
-        return [this.createLambdaAuthorizer(scope, this.authProps)];
+        return [this.createLambdaAuthorizer(scope, this.config.RESOURCES.AUTHORIZER!)];
     }
 
     private createLambdaAuthorizer(scope: Construct, lambdaConfig: TsgLambdaProp) {

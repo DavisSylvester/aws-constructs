@@ -145,3 +145,4 @@ When using this library it is a good practice to start with a new CDK project
   - `cdk deploy`
 
 
+Release Version : `1.0.28`

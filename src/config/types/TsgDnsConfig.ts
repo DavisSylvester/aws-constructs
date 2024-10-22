@@ -6,4 +6,6 @@ export interface TsgDnsAppConfig {
     FQDN: string;
     ZoneExist: boolean;
     ZoneId?: string;
+    SubDomainName?: string;
+    SubDomainNameForApi?: string;
 }
