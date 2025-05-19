@@ -8,7 +8,7 @@ export const config: IAppConfig = {
         name: `${process.env.APP_NAME}`,
         accountNumber: process.env.CDK_DEFAULT_ACCOUNT || "",
         region: process.env.CDK_DEFAULT_REGION || "us-east-1",
-        stackRuntime: Runtime.NODEJS_18_X,
+        stackRuntime: Runtime.NODEJS_22_X,
     },
     API: {
         Name: `${process.env.APP_NAME}-auth-api`,
