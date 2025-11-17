@@ -48,7 +48,7 @@
     "constructs": "^10.4.2",
     "dotenv": "^16.6.1",
     "fsbin": "^1.0.11",
-    "luxon": "^3.6.1",
+    "luxon": "^3.7.2",
     "source-map-support": "^0.5.21",
     "uuid": "^11.1.0",
     "winston": "^3.18.3"
