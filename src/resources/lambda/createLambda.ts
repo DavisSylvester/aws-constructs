@@ -2,7 +2,7 @@ import { CfnOutput, Duration } from "aws-cdk-lib";
 import { TokenAuthorizer } from "aws-cdk-lib/aws-apigateway";
 import { Alarm, ComparisonOperator, IAlarmAction } from "aws-cdk-lib/aws-cloudwatch";
 import { IRole, ManagedPolicy } from "aws-cdk-lib/aws-iam";
-import { LayerVersion } from "aws-cdk-lib/aws-lambda";
+import { LayerVersion, Runtime } from "aws-cdk-lib/aws-lambda";
 import { NodejsFunction, NodejsFunctionProps, SourceMapMode } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 import * as path from 'path';
@@ -15,7 +15,6 @@ import { BaseResource } from "../base/baseResource";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { LambdaHelper } from "./lambdaHelper";
 import { getUUID } from "../../helpers/util-helper";
-import { Environment } from "../../config/Environments";
 
 
 export class CreateLambda extends BaseResource<NodejsFunction> {
@@ -195,6 +194,10 @@ export class CreateLambda extends BaseResource<NodejsFunction> {
 
         return lambdaRecord;
     }
+
+   
+
+    
 }
 
 
