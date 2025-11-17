@@ -10,8 +10,7 @@ export interface TimerJobProps {
     timeoutInMinutes: number;
     memory: number;
     envs: Record<string, string>;
-    role?: IRole;
-    layers?: LayerVersion[],
+    role?: IRole;    
     cronOptions: CronOptions;
     dynamoTableNames?: string[];
     lambdaLayerArn?: string[];
