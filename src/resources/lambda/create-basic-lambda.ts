@@ -27,7 +27,7 @@ export const createBasicLambdaTimerJob = (scope: Construct, props: TimerJobProps
 
     grantAccessToDynamoTables(scope, lambdaFunction, props.dynamoTableNames);
    
-    addLambdaLayers(scope, lambdaFunction, props.layers);
+    addLambdaLayers(scope, lambdaFunction, props.lambdaLayerArn);
 };
 
 const createBasicLambdaProps = (props: TimerJobProps) => {
@@ -53,7 +53,7 @@ const createBasicLambdaProps = (props: TimerJobProps) => {
                 }
             },
            role: props.role,
-           layers: props.layers
+           layers: undefined
         }
 
         return lambdaProp;
@@ -91,7 +91,7 @@ const grantAccessToDynamoTables = (scope: Construct, lambda: NodejsFunction, tab
         }
 };
 
-const addLambdaLayers = (scope: Construct, lambda: NodejsFunction, layerArns: string[]) => {
+const addLambdaLayers = (scope: Construct, lambda: NodejsFunction, layerArns?: string[]) => {
 
     if (layerArns &&  layerArns.length > 0) {
         layerArns.forEach((arn: string, idx: number) => {
