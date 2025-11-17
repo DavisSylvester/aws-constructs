@@ -27,8 +27,8 @@ importers:
         specifier: ^0.5.21
         version: 0.5.21
       uuid:
-        specifier: link:@types\uuid
-        version: link:@types/uuid
+        specifier: ^13.0.0
+        version: 13.0.0
       winston:
         specifier: ^3.18.3
         version: 3.18.3
