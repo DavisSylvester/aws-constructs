@@ -13,8 +13,7 @@ import { createSeedDatabaseCustomResource } from "../resources/customResource/cr
 import { IRestApi } from "aws-cdk-lib/aws-apigateway";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
-import { Environment } from "../config/Environments";
-import { Logger } from "../helpers/logger";
+
 export class MicroService extends Construct {
 
     protected readonly requireDynamoTables: boolean;
