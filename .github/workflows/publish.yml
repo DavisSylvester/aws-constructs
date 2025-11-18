@@ -25,7 +25,14 @@ jobs:
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          if [ -f pnpm-lock.yaml ]; then
+            echo "Found pnpm-lock.yaml; using --frozen-lockfile"
+            pnpm install --frozen-lockfile
+          else
+            echo "No pnpm-lock.yaml present; performing regular install"
+            pnpm install
+          fi
       - name: Verify npm auth & scope
         run: |
           npm whoami || { echo 'Not authenticated'; exit 1; }
