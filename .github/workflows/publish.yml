@@ -33,12 +33,6 @@ jobs:
             echo "No pnpm-lock.yaml present; performing regular install"
             pnpm install
           fi
-      - name: Configure npm for @sylvesterllc scope
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > ~/.npmrc
-          npm config set @sylvesterllc:registry https://registry.npmjs.org/
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
       - name: Verify npm auth & scope
         run: |
           npm whoami || { echo 'Not authenticated'; exit 1; }
