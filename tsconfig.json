@@ -27,6 +27,7 @@
       "typeRoots": [
         "./node_modules/@types"
       ],
+      "skipLibCheck": true,
       "paths": {
         "@davissylvester/common": ["./layers/common/dist/nodejs/node_modules/@davissylvester/common"],
         
@@ -34,7 +35,8 @@
     },
     "exclude": [
       "node_modules",
-      "cdk.out"
+      "cdk.out",
+      "__tests__"
     ],
     "include": [
         "src"
