@@ -10,6 +10,7 @@ import { SERVICE_PRINCIPAL } from "../../constants/aws-service-principal-constan
 import { CronOptions, Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { Table } from "aws-cdk-lib/aws-dynamodb";
+import { LambdaProps } from "../../interfaces/lambda";
 
 
 
@@ -19,7 +20,7 @@ export const createBasicLambdaTimerJob = (scope: Construct, props: TimerJobProps
 
     let lambdaFunction = new NodejsFunction(scope, `${props.appPrefix}${props.functionName}`, lambdaProps);
 
-    addInvokePermissionToLambdaForEvents(lambdaFunction);
+    addInvokePermissionToLambdaForEvents(lambdaFunction, props);
 
     const eventRule = createEventRuleForLambda(scope, lambdaFunction, props.cronOptions);
 
@@ -30,10 +31,24 @@ export const createBasicLambdaTimerJob = (scope: Construct, props: TimerJobProps
     addLambdaLayers(scope, lambdaFunction, props.lambdaLayerArn);
 };
 
-const createBasicLambdaProps = (props: TimerJobProps) => {
 
+export const createBasicLambda = (scope: Construct, props: LambdaProps) => {
+
+    const lambdaProps = createBasicLambdaProps(props);
+
+    let lambdaFunction = new NodejsFunction(scope, `${props.appPrefix}${props.functionName}`, lambdaProps);
+    
+    grantAccessToDynamoTables(scope, lambdaFunction, props.dynamoTableNames);
+   
+    addLambdaLayers(scope, lambdaFunction, props.lambdaLayerArn);
+};
+
+const createBasicLambdaProps = (props: LambdaProps) => {
+
+         const entryPath = (props.codePath) ? path.resolve(props.codePath) : path.resolve(`./resources/lambdas/timer-jobs/${props.functionName}/main.mts`);
+         
          const lambdaProp: NodejsFunctionProps = {
-            entry: (props.codePath) ? path.join(props.codePath) : path.join(`./resources/lambdas/timer-jobs/${props.functionName}/main.mts`),
+            entry: entryPath,
             functionName: `${(props.appPrefix) ? `${props.appPrefix}-` : ''}${props.functionName}`,
             handler: 'main.ts',
             logRetention: RetentionDays.TWO_WEEKS,
@@ -43,6 +58,8 @@ const createBasicLambdaProps = (props: TimerJobProps) => {
             environment: {                
                 ...props.envs
             },
+            projectRoot: props.projectRoot,
+            depsLockFilePath: props.depsLockFilePath,
             bundling: {
                 minify: true,
                 target: `esnext`,
@@ -59,9 +76,9 @@ const createBasicLambdaProps = (props: TimerJobProps) => {
         return lambdaProp;
 };
 
-const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction) => {
+const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction, props: TimerJobProps) => {
 
-     lambda.addPermission(`InvokePermission-${lambda.functionName}`, {
+     lambda.addPermission(`InvokePermission-${props.functionName?.toLocaleLowerCase()}`, {
             principal: new ServicePrincipal(SERVICE_PRINCIPAL.EVENTS),
         });
 };
