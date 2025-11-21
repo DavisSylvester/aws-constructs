@@ -46,7 +46,7 @@ export const createBasicLambdaTimerJob = (
 
 const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   let resolvedEntry: string;
-  
+
   if (props.codePath && path.isAbsolute(props.codePath)) {
     resolvedEntry = props.codePath;
   } else if (props.codePath && props.projectRoot) {
@@ -54,13 +54,19 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
     resolvedEntry = path.resolve(process.cwd(), props.codePath);
   } else if (props.projectRoot) {
     // No codePath, use default path with projectRoot
-    resolvedEntry = path.resolve(process.cwd(), props.projectRoot, `resources/lambdas/timer-jobs/${props.functionName}/main.mts`);
+    resolvedEntry = path.resolve(
+      process.cwd(),
+      props.projectRoot,
+      `resources/lambdas/timer-jobs/${props.functionName}/main.mts`
+    );
   } else if (props.codePath) {
     // codePath without projectRoot
     resolvedEntry = path.resolve(process.cwd(), props.codePath);
   } else {
     // Default path without projectRoot
-    resolvedEntry = path.join(`./resources/lambdas/timer-jobs/${props.functionName}/main.mts`);
+    resolvedEntry = path.join(
+      `./resources/lambdas/timer-jobs/${props.functionName}/main.mts`
+    );
   }
 
   const lambdaProp: NodejsFunctionProps = {
