@@ -32,10 +32,26 @@ export const createBasicLambda = (
 };
 
 const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
+  let resolvedEntry: string;
+  
+  if (props.codePath && path.isAbsolute(props.codePath)) {
+    resolvedEntry = props.codePath;
+  } else if (props.codePath && props.projectRoot) {
+    // codePath is relative, resolve from current directory + projectRoot
+    resolvedEntry = path.resolve(process.cwd(), props.codePath);
+  } else if (props.projectRoot) {
+    // No codePath, use default path with projectRoot
+    resolvedEntry = path.resolve(process.cwd(), props.projectRoot, `resources/lambdas/${props.functionName}/main.mts`);
+  } else if (props.codePath) {
+    // codePath without projectRoot
+    resolvedEntry = path.resolve(process.cwd(), props.codePath);
+  } else {
+    // Default path without projectRoot
+    resolvedEntry = path.join(`./resources/lambdas/${props.functionName}/main.mts`);
+  }
+
   const lambdaProp: NodejsFunctionProps = {
-    entry: props.codePath
-      ? path.join(props.codePath)
-      : path.join(`./resources/lambdas/${props.functionName}/main.mts`),
+    entry: resolvedEntry,
     functionName: `${props.appPrefix ? `${props.appPrefix}-` : ""}${
       props.functionName
     }`,
@@ -57,6 +73,10 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
       environment: {
         ...props.envs,
       },
+      ...(props.projectRoot && { projectRoot: props.projectRoot }),
+      ...(props.depsLockFilePath && {
+        depsLockFilePath: props.depsLockFilePath,
+      }),
     },
     role: props.role,
     layers: undefined,
