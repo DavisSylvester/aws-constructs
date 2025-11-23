@@ -21,13 +21,11 @@ export const createBasicLambdaTimerJob = (
 ): NodejsFunction => {
   const lambdaProps = createBasicLambdaProps(props);
 
-  let lambdaFunction = new NodejsFunction(
-    scope,
-    `${props.appPrefix}${props.functionName}`,
-    lambdaProps
-  );
+  const functionName = `${props.appPrefix}${props.functionName}`;
 
-  addInvokePermissionToLambdaForEvents(lambdaFunction);
+  let lambdaFunction = new NodejsFunction(scope, functionName, lambdaProps);
+
+  addInvokePermissionToLambdaForEvents(lambdaFunction, functionName);
 
   const eventRule = createEventRuleForLambda(
     scope,
@@ -46,6 +44,7 @@ export const createBasicLambdaTimerJob = (
 
 const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   let resolvedEntry: string;
+  let depsLockFilePath: string | undefined = props.depsLockFilePath;
 
   if (props.codePath && path.isAbsolute(props.codePath)) {
     resolvedEntry = props.codePath;
@@ -69,12 +68,24 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
     );
   }
 
+  // When projectRoot is provided, override depsLockFilePath to point to the projectRoot's lock file
+  if (props.projectRoot && !depsLockFilePath) {
+    const lockFiles = ["pnpm-lock.yaml", "yarn.lock", "package-lock.json"];
+    for (const lockFile of lockFiles) {
+      const lockPath = path.join(props.projectRoot, lockFile);
+      if (require("fs").existsSync(lockPath)) {
+        depsLockFilePath = lockPath;
+        break;
+      }
+    }
+  }
+
   const lambdaProp: NodejsFunctionProps = {
     entry: resolvedEntry,
     functionName: `${props.appPrefix ? `${props.appPrefix}-` : ""}${
       props.functionName
     }`,
-    handler: "main.ts",
+    handler: "index.main",
     logRetention: RetentionDays.TWO_WEEKS,
     runtime: Runtime.NODEJS_LATEST,
     timeout: Duration.minutes(
@@ -93,8 +104,8 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
         ...props.envs,
       },
       ...(props.projectRoot && { projectRoot: props.projectRoot }),
-      ...(props.depsLockFilePath && {
-        depsLockFilePath: props.depsLockFilePath,
+      ...(depsLockFilePath && {
+        depsLockFilePath: depsLockFilePath,
       }),
     },
     role: props.role,
@@ -104,8 +115,11 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   return lambdaProp;
 };
 
-const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction) => {
-  lambda.addPermission(`InvokePermission-${lambda.functionName}`, {
+const addInvokePermissionToLambdaForEvents = (
+  lambda: NodejsFunction,
+  functionName: string
+) => {
+  lambda.addPermission(`InvokePermission-${functionName}`, {
     principal: new ServicePrincipal(SERVICE_PRINCIPAL.EVENTS),
   });
 };

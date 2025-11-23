@@ -18,21 +18,25 @@ export const createBasicLambda = (
 ): NodejsFunction => {
   const lambdaProps = createBasicLambdaProps(props);
 
-  let lambdaFunction = new NodejsFunction(
+  const functionName = `${props.appPrefix || ""}${props.functionName}`;
+
+  let lambdaFunction = new NodejsFunction(scope, functionName, lambdaProps);
+
+  grantAccessToDynamoTables(
     scope,
-    `${props.appPrefix || ""}${props.functionName}`,
-    lambdaProps
+    lambdaFunction,
+    functionName,
+    props.dynamoTableNames
   );
 
-  grantAccessToDynamoTables(scope, lambdaFunction, props.dynamoTableNames);
-
-  addLambdaLayers(scope, lambdaFunction, props.lambdaLayerArn);
+  addLambdaLayers(scope, lambdaFunction, functionName, props.lambdaLayerArn);
 
   return lambdaFunction;
 };
 
 const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
   let resolvedEntry: string;
+  let depsLockFilePath: string | undefined = props.depsLockFilePath;
 
   if (props.codePath && path.isAbsolute(props.codePath)) {
     resolvedEntry = props.codePath;
@@ -56,12 +60,24 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
     );
   }
 
+  // When projectRoot is provided, override depsLockFilePath to point to the projectRoot's lock file
+  if (props.projectRoot && !depsLockFilePath) {
+    const lockFiles = ["pnpm-lock.yaml", "yarn.lock", "package-lock.json"];
+    for (const lockFile of lockFiles) {
+      const lockPath = path.join(props.projectRoot, lockFile);
+      if (require("fs").existsSync(lockPath)) {
+        depsLockFilePath = lockPath;
+        break;
+      }
+    }
+  }
+
   const lambdaProp: NodejsFunctionProps = {
     entry: resolvedEntry,
     functionName: `${props.appPrefix ? `${props.appPrefix}-` : ""}${
       props.functionName
     }`,
-    handler: "main.ts",
+    handler: "index.main",
     logRetention: RetentionDays.TWO_WEEKS,
     runtime: Runtime.NODEJS_LATEST,
     timeout: Duration.minutes(
@@ -80,8 +96,8 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
         ...props.envs,
       },
       ...(props.projectRoot && { projectRoot: props.projectRoot }),
-      ...(props.depsLockFilePath && {
-        depsLockFilePath: props.depsLockFilePath,
+      ...(depsLockFilePath && {
+        depsLockFilePath: depsLockFilePath,
       }),
     },
     role: props.role,
@@ -94,11 +110,16 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
 const grantAccessToDynamoTables = (
   scope: Construct,
   lambda: NodejsFunction,
+  functionName: string,
   tableNames?: string[]
 ) => {
   if (tableNames && tableNames.length > 0) {
-    tableNames.forEach((tableName) => {
-      const table = Table.fromTableName(scope, `${tableName}-table`, tableName);
+    tableNames.forEach((tableName, idx) => {
+      const table = Table.fromTableName(
+        scope,
+        `${tableName}-table-${idx}`,
+        tableName
+      );
 
       table.grantReadWriteData(lambda);
     });
@@ -108,6 +129,7 @@ const grantAccessToDynamoTables = (
 const addLambdaLayers = (
   scope: Construct,
   lambda: NodejsFunction,
+  functionName: string,
   layerArns?: string[]
 ) => {
   if (layerArns && layerArns.length > 0) {
