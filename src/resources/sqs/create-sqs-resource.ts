@@ -4,7 +4,7 @@ import { Construct } from "constructs";
 export const createSQSResource = (scope: Construct, queueName: string) => {
   
     const dlQueue = new Queue(scope, `sqs-queue-dl-${queueName} `, {
-    queueName,        
+    queueName: `${queueName}-dead-letter-queue`,        
   });
 
     const queueProp: QueueProps = {
@@ -16,7 +16,7 @@ export const createSQSResource = (scope: Construct, queueName: string) => {
     };
   
     // SQS resource creation logic goes here
-  const createdQueue = new Queue(scope, `sqs-queue-${queueName} `, queueProp);
+  const createdQueue = new Queue(scope, `sqs-queue-${queueName}`, queueProp);
 
   return createdQueue;
 };
