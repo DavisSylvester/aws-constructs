@@ -27,7 +27,7 @@ export const createBasicLambdaTimerJob = (
     lambdaProps
   );
 
-  addInvokePermissionToLambdaForEvents(lambdaFunction);
+  addInvokePermissionToLambdaForEvents(lambdaFunction, props.functionName);
 
   const eventRule = createEventRuleForLambda(
     scope,
@@ -104,8 +104,8 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   return lambdaProp;
 };
 
-const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction) => {
-  lambda.addPermission(`InvokePermission-${lambda.functionName}`, {
+const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction, functionName: string) => {
+  lambda.addPermission(`InvokePermission-${functionName}`, {
     principal: new ServicePrincipal(SERVICE_PRINCIPAL.EVENTS),
   });
 };
