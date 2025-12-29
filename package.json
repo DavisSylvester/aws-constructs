@@ -50,6 +50,6 @@
     "luxon": "^3.7.2",
     "source-map-support": "^0.5.21",
     "uuid": "^13.0.0",
-    "winston": "^3.18.3"
+    "winston": "^3.19.0"
   }
 }
