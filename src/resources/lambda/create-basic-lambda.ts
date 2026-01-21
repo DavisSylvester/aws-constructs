@@ -17,14 +17,14 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
 
 export const createBasicLambdaTimerJob = (
   scope: Construct,
-  props: TimerJobProps
+  props: TimerJobProps,
 ): NodejsFunction => {
   const lambdaProps = createBasicLambdaProps(props);
 
   let lambdaFunction = new NodejsFunction(
     scope,
     `${props.appPrefix}${props.functionName}`,
-    lambdaProps
+    lambdaProps,
   );
 
   addInvokePermissionToLambdaForEvents(lambdaFunction, props.functionName);
@@ -32,7 +32,7 @@ export const createBasicLambdaTimerJob = (
   const eventRule = createEventRuleForLambda(
     scope,
     lambdaFunction,
-    props.cronOptions
+    props.cronOptions,
   );
 
   eventRule.addTarget(new LambdaFunction(lambdaFunction));
@@ -57,7 +57,7 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
     resolvedEntry = path.resolve(
       process.cwd(),
       props.projectRoot,
-      `resources/lambdas/timer-jobs/${props.functionName}/main.mts`
+      `resources/lambdas/timer-jobs/${props.functionName}/main.mts`,
     );
   } else if (props.codePath) {
     // codePath without projectRoot
@@ -65,7 +65,7 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   } else {
     // Default path without projectRoot
     resolvedEntry = path.join(
-      `./resources/lambdas/timer-jobs/${props.functionName}/main.mts`
+      `./resources/lambdas/timer-jobs/${props.functionName}/main.mts`,
     );
   }
 
@@ -74,11 +74,11 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
     functionName: `${props.appPrefix ? `${props.appPrefix}-` : ""}${
       props.functionName
     }`,
-    handler: "main.ts",
+    handler: "main",
     logRetention: RetentionDays.TWO_WEEKS,
     runtime: Runtime.NODEJS_LATEST,
     timeout: Duration.minutes(
-      props.timeoutInMinutes ? props.timeoutInMinutes : 1
+      props.timeoutInMinutes ? props.timeoutInMinutes : 1,
     ),
     memorySize: props.memory,
     environment: {
@@ -104,7 +104,10 @@ const createBasicLambdaProps = (props: TimerJobProps): NodejsFunctionProps => {
   return lambdaProp;
 };
 
-const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction, functionName: string) => {
+const addInvokePermissionToLambdaForEvents = (
+  lambda: NodejsFunction,
+  functionName: string,
+) => {
   lambda.addPermission(`InvokePermission-${functionName}`, {
     principal: new ServicePrincipal(SERVICE_PRINCIPAL.EVENTS),
   });
@@ -113,14 +116,14 @@ const addInvokePermissionToLambdaForEvents = (lambda: NodejsFunction, functionNa
 const createEventRuleForLambda = (
   scope: Construct,
   lambda: NodejsFunction,
-  options: CronOptions
+  options: CronOptions,
 ) => {
   const eventRule = new Rule(
     scope,
     `scheduleRule-${lambda?.node.id || "010"}`,
     {
       schedule: Schedule.cron(options),
-    }
+    },
   );
 
   return eventRule;
@@ -129,7 +132,7 @@ const createEventRuleForLambda = (
 const grantAccessToDynamoTables = (
   scope: Construct,
   lambda: NodejsFunction,
-  tableNames?: string[]
+  tableNames?: string[],
 ) => {
   if (tableNames && tableNames.length > 0) {
     tableNames.forEach((tableName) => {
@@ -143,14 +146,14 @@ const grantAccessToDynamoTables = (
 const addLambdaLayers = (
   scope: Construct,
   lambda: NodejsFunction,
-  layerArns?: string[]
+  layerArns?: string[],
 ) => {
   if (layerArns && layerArns.length > 0) {
     layerArns.forEach((arn: string, idx: number) => {
       const layer = LayerVersion.fromLayerVersionArn(
         scope,
         `common-layer-${idx}`,
-        arn
+        arn,
       );
 
       lambda.addLayers(layer);

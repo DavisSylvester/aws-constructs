@@ -14,14 +14,14 @@ import { Table } from "aws-cdk-lib/aws-dynamodb";
 
 export const createBasicLambda = (
   scope: Construct,
-  props: LambdaProps
+  props: LambdaProps,
 ): NodejsFunction => {
   const lambdaProps = createBasicLambdaProps(props);
 
   let lambdaFunction = new NodejsFunction(
     scope,
     `${props.appPrefix || ""}${props.functionName}`,
-    lambdaProps
+    lambdaProps,
   );
 
   grantAccessToDynamoTables(scope, lambdaFunction, props.dynamoTableNames);
@@ -44,7 +44,7 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
     resolvedEntry = path.resolve(
       process.cwd(),
       props.projectRoot,
-      `resources/lambdas/${props.functionName}/main.mts`
+      `resources/lambdas/${props.functionName}/main.mts`,
     );
   } else if (props.codePath) {
     // codePath without projectRoot
@@ -52,7 +52,7 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
   } else {
     // Default path without projectRoot
     resolvedEntry = path.join(
-      `./resources/lambdas/${props.functionName}/main.mts`
+      `./resources/lambdas/${props.functionName}/main.mts`,
     );
   }
 
@@ -61,11 +61,11 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
     functionName: `${props.appPrefix ? `${props.appPrefix}-` : ""}${
       props.functionName
     }`,
-    handler: "main.ts",
+    handler: "main",
     logRetention: RetentionDays.TWO_WEEKS,
     runtime: Runtime.NODEJS_LATEST,
     timeout: Duration.minutes(
-      props.timeoutInMinutes ? props.timeoutInMinutes : 1
+      props.timeoutInMinutes ? props.timeoutInMinutes : 1,
     ),
     memorySize: props.memory,
     environment: {
@@ -94,7 +94,7 @@ const createBasicLambdaProps = (props: LambdaProps): NodejsFunctionProps => {
 const grantAccessToDynamoTables = (
   scope: Construct,
   lambda: NodejsFunction,
-  tableNames?: string[]
+  tableNames?: string[],
 ) => {
   if (tableNames && tableNames.length > 0) {
     tableNames.forEach((tableName) => {
@@ -108,14 +108,14 @@ const grantAccessToDynamoTables = (
 const addLambdaLayers = (
   scope: Construct,
   lambda: NodejsFunction,
-  layerArns?: string[]
+  layerArns?: string[],
 ) => {
   if (layerArns && layerArns.length > 0) {
     layerArns.forEach((arn: string, idx: number) => {
       const layer = LayerVersion.fromLayerVersionArn(
         scope,
         `common-layer-${idx}`,
-        arn
+        arn,
       );
 
       lambda.addLayers(layer);

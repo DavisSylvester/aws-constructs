@@ -8,12 +8,9 @@ import {
   TableProps,
 } from "aws-cdk-lib/aws-dynamodb";
 import { Construct } from "constructs";
-import { TsgBaseResource } from "../base/tsgBaseResource";
 
-export class CreateDynamoSingleTableDesign extends TsgBaseResource<
-  Table,
-  string
-> {
+export class CreateDynamoSingleTableDesign extends Construct {
+  public readonly createdResource: Table;
   static ReadWriteActions: string[] = [
     "dynamodb:BatchGetItem",
     "dynamodb:BatchWriteItem",
@@ -33,12 +30,18 @@ export class CreateDynamoSingleTableDesign extends TsgBaseResource<
     return this.createdResource;
   }
 
-  constructor(protected scope: Construct, protected tableName: string) {
-    super(scope, tableName);
+  constructor(
+    scope: Construct,
+    id: string,
+    protected tableName: string,
+  ) {
+    super(scope, id);
+    this.createdResource = this.createResource();
+    this.createOutput();
   }
 
-  protected createResource(scope: Construct): Table {
-    const dbTable = new Table(scope, `${this.tableName}`, {
+  protected createResource(): Table {
+    const dbTable = new Table(this, "Table", {
       tableName: this.tableName,
       removalPolicy: RemovalPolicy.DESTROY,
 
@@ -106,9 +109,9 @@ export class CreateDynamoSingleTableDesign extends TsgBaseResource<
     return dbTable;
   }
 
-  protected createOutput<T>(scope: Construct): void {
+  protected createOutput(): void {
     // Logical IDs must not include unresolved tokens; use a stable ID
-    new CfnOutput(scope, "dynamoTable", {
+    new CfnOutput(this, "TableOutput", {
       value: `Table Name: ${this.createdResource?.tableName}\t Table Arn: ${this.createdResource?.tableArn}`,
     });
   }

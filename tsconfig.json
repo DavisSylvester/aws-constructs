@@ -28,6 +28,8 @@
         "./node_modules/@types"
       ],
       "skipLibCheck": true,
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
       "paths": {
         "@davissylvester/common": ["./layers/common/dist/nodejs/node_modules/@davissylvester/common"],
         
