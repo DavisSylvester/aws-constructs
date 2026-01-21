@@ -1,4 +1,4 @@
-name: Publish to npm
+name: Publish to npm and GitHub Packages
 on:
   push:
     branches:
@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: write
       id-token: write # for provenance (optional)
     steps:
       - uses: actions/checkout@v4
@@ -24,6 +25,10 @@ jobs:
           node-version: "22.x"
           registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
+      - name: Configure npm authentication
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > ~/.npmrc
+          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
       - name: Install dependencies
         run: |
           if [ -f pnpm-lock.yaml ]; then
@@ -38,8 +43,6 @@ jobs:
           npm whoami || { echo 'Not authenticated'; exit 1; }
           npm ping
           echo "Publishing package version $(jq -r '.version' package.json)"
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
       - name: Run tests
         run: pnpm test -- --passWithNoTests
       - name: Build
@@ -50,7 +53,13 @@ jobs:
           if npm view @sylvesterllc/aws-constructs@"$V" version >/dev/null 2>&1; then
             echo "Version $V already published"; exit 1;
           fi
-      - name: Publish
+      - name: Publish to npmjs
         run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_TOKEN }}
+
+      # Publish to GitHub Packages
+      - name: Configure GitHub Packages authentication
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
+          echo "@sylvesterllc:registry=https://npm.pkg.github.com" >> ~/.npmrc
+      - name: Publish to GitHub Packages
+        run: npm publish --registry=https://npm.pkg.github.com
