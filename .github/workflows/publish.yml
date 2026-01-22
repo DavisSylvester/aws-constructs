@@ -23,12 +23,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22.x"
-          registry-url: "https://registry.npmjs.org"
           cache: "pnpm"
-      - name: Configure npm authentication
+      - name: Configure .npmrc for npm registry
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}" > ~/.npmrc
-          echo "registry=https://registry.npmjs.org/" >> ~/.npmrc
+          cat > ~/.npmrc << EOF
+          //registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}
+          registry=https://registry.npmjs.org/
+          EOF
       - name: Install dependencies
         run: |
           if [ -f pnpm-lock.yaml ]; then
@@ -57,9 +58,12 @@ jobs:
         run: npm publish --access public --provenance
 
       # Publish to GitHub Packages
-      - name: Configure GitHub Packages authentication
+      - name: Configure .npmrc for GitHub Packages
         run: |
-          echo "//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
-          echo "@sylvesterllc:registry=https://npm.pkg.github.com" >> ~/.npmrc
+          cat > ~/.npmrc << EOF
+          //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
+          @sylvesterllc:registry=https://npm.pkg.github.com
+          registry=https://registry.npmjs.org/
+          EOF
       - name: Publish to GitHub Packages
         run: npm publish --registry=https://npm.pkg.github.com
