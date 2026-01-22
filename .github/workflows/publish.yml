@@ -57,12 +57,17 @@ jobs:
       - name: Publish to npmjs
         run: npm publish --access public --provenance
 
-      # Publish to GitHub Packages
+      # Publish to GitHub Packages with different scope
+      - name: Update package name for GitHub Packages
+        run: |
+          jq '.name = "@davissylvester/aws-constructs"' package.json > package.json.tmp
+          mv package.json.tmp package.json
+          echo "Updated package name to $(jq -r '.name' package.json)"
       - name: Configure .npmrc for GitHub Packages
         run: |
           cat > ~/.npmrc << EOF
           //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}
-          @sylvesterllc:registry=https://npm.pkg.github.com
+          @davissylvester:registry=https://npm.pkg.github.com
           registry=https://registry.npmjs.org/
           EOF
       - name: Publish to GitHub Packages
