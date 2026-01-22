@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { TimerJobProps } from "../interfaces/timer-job";
-import { createBasicLambdaTimerJob } from "../resources/lambda/create-basic-lambda.js";
+import { createBasicLambdaTimerJob } from "../resources/lambda/create-basic-lambda";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 export class TimerJob extends Construct {
@@ -10,7 +10,7 @@ export class TimerJob extends Construct {
     scope: Construct,
     id: string,
     props: TimerJobProps,
-    private env: string
+    private env: string,
   ) {
     super(scope, id);
 

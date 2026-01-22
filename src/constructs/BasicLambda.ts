@@ -1,6 +1,6 @@
 import { Construct } from "constructs";
 import { LambdaProps } from "../interfaces/lambda";
-import { createBasicLambda } from "../resources/lambda/create-basic-lambda-helper.js";
+import { createBasicLambda } from "../resources/lambda/create-basic-lambda-helper";
 import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 
 export class BasicLambda extends Construct {
@@ -10,7 +10,7 @@ export class BasicLambda extends Construct {
     scope: Construct,
     id: string,
     props: LambdaProps,
-    private env: string
+    private env: string,
   ) {
     super(scope, id);
 
