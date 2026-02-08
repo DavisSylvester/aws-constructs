@@ -15,7 +15,7 @@ import {
   CfnDistribution,
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
-import { DnsValidatedCertificate, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { Certificate, CertificateValidation, DnsValidatedCertificate, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import {
   HostedZone,
   IHostedZone,
@@ -77,12 +77,7 @@ export class SpaCFRoute53 extends Construct {
     // Prefer direct import when a hostedZoneId is provided; use a dummy hosted zone for tests;
     // otherwise perform a lookup in the current account.
     const hostedZone: IHostedZone =
-      props.domainName === "example.com"
-        ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
-            hostedZoneId: "Z000000000000000TEST",
-            zoneName: props.domainName,
-          })
-        : props.hostedZoneId
+      props.hostedZoneId
         ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
             hostedZoneId: props.hostedZoneId,
             zoneName: props.domainName,
@@ -93,11 +88,12 @@ export class SpaCFRoute53 extends Construct {
 
     // ACM certificate (must be in us-east-1 for CloudFront)
     // Create a DNS-validated certificate in us-east-1 and tag it with a friendly name
-    const certificate: ICertificate = new DnsValidatedCertificate(this, "SpaCert", {
-      domainName: props.fqdn,
-      hostedZone,
-      region: "us-east-1",
-      subjectAlternativeNames: props.domainName && props.domainName !== props.fqdn ? [props.domainName] : undefined,
+    const certificate: ICertificate = new Certificate(this, "SpaCert", {
+      domainName: props.domainName,
+      subjectAlternativeNames: [
+        props.fqdn,       
+      ],
+        validation: CertificateValidation.fromDns(hostedZone),
     });
     // Tag for visibility in console: "Certificate name"
     Tags.of(certificate).add("Name", `${props.siteName}-cert-cf`);
