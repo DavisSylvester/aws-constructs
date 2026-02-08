@@ -3,6 +3,8 @@ import {
   Bucket,
   BlockPublicAccess,
   BucketEncryption,
+  BucketAccessControl,
+  ObjectOwnership,
 } from "aws-cdk-lib/aws-s3";
 import {
   Distribution,
@@ -49,6 +51,9 @@ export class SpaCFRoute53 extends Construct {
         blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         encryption: BucketEncryption.S3_MANAGED,
         versioned: false,
+        // CloudFront standard logs require ACLs; enable them and grant log delivery write
+        objectOwnership: ObjectOwnership.OBJECT_WRITER,
+        accessControl: BucketAccessControl.LOG_DELIVERY_WRITE,
       },
     );
 
