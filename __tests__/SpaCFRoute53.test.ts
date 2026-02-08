@@ -56,7 +56,7 @@ describe("SpaCFRoute53", () => {
         Aliases: [props.fqdn],
         DefaultRootObject: "index.html",
         ViewerCertificate: {
-          MinimumProtocolVersion: "TLSv1.3_2021",
+          MinimumProtocolVersion: "TLSv1.3_2025",
         },
         DefaultCacheBehavior: {
           AllowedMethods: ["GET", "HEAD"],

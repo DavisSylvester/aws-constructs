@@ -123,7 +123,7 @@ export class SpaCFRoute53 extends Construct {
     const cfnDist = this.distribution.node.defaultChild as CfnDistribution;
     cfnDist.addPropertyOverride(
       "DistributionConfig.ViewerCertificate.MinimumProtocolVersion",
-      "TLSv1.3_2021",
+      "TLSv1.3_2025",
     );
 
     this.distributionDomainName = this.distribution.distributionDomainName;
