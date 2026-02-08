@@ -1,1 +1,1 @@
-export { LambdaProps } from "./lambda-props";
+export type { LambdaProps } from "./lambda-props";
