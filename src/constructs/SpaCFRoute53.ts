@@ -3,8 +3,6 @@ import {
   Bucket,
   BlockPublicAccess,
   BucketEncryption,
-  BucketProps,
-  BucketAccessControl,
 } from "aws-cdk-lib/aws-s3";
 import {
   Distribution,
@@ -12,8 +10,6 @@ import {
   AllowedMethods,
   PriceClass,
   ResponseHeadersPolicy,
-  ErrorResponse,
-  OriginProtocolPolicy,
   CfnDistribution,
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
@@ -127,7 +123,7 @@ export class SpaCFRoute53 extends Construct {
     const cfnDist = this.distribution.node.defaultChild as CfnDistribution;
     cfnDist.addPropertyOverride(
       "DistributionConfig.ViewerCertificate.MinimumProtocolVersion",
-      "TLSv1.3_2021",
+      "TLSv1.3_2025",
     );
 
     this.distributionDomainName = this.distribution.distributionDomainName;
