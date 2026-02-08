@@ -14,8 +14,8 @@ import {
   ResponseHeadersPolicy,
   CfnDistribution,
 } from "aws-cdk-lib/aws-cloudfront";
-import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
-import { Certificate, CertificateValidation, DnsValidatedCertificate, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
+import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
+import { Certificate, CertificateValidation, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import {
   HostedZone,
   IHostedZone,
@@ -24,8 +24,7 @@ import {
 } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
 import { SpaProps } from "../interfaces/SpaProps";
-import { Tags, RemovalPolicy, Duration } from "aws-cdk-lib";
-import { ulid } from "../helpers/ulid";
+import { Tags, RemovalPolicy, Duration, CfnOutput } from "aws-cdk-lib";
 
 export class SpaCFRoute53 extends Construct {
   public readonly bucket: Bucket;
@@ -37,13 +36,13 @@ export class SpaCFRoute53 extends Construct {
   constructor(scope: Construct, id: string, props: SpaProps) {
     super(scope, id);
 
-    // Generate a unique suffix for resource names
-    const uniqueId = ulid();
+    // Build a safe key from domain for export names (replace dots)
+    const domainKey = (props.fqdn ?? props.domainName).split(".").join("-");
 
     // Logs bucket with 14-day retention
     this.logsBucket = new Bucket(
       this,
-      `${props.domainName?.toLowerCase()}-spa-bucket-log-${uniqueId}`,
+      `${props.domainName?.toLowerCase()}-spa-bucket-log`,
       {
         removalPolicy: RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
@@ -60,7 +59,7 @@ export class SpaCFRoute53 extends Construct {
     // Main SPA bucket
     this.bucket = new Bucket(
       this,
-      `${props.domainName?.toLowerCase()}-spa-bucket-${uniqueId}`,
+      `${props.domainName?.toLowerCase()}-spa-bucket`,
       {
         bucketName: props.bucketName,
         removalPolicy: RemovalPolicy.DESTROY,
@@ -101,7 +100,7 @@ export class SpaCFRoute53 extends Construct {
     // CloudFront distribution
     this.distribution = new Distribution(this, "SpaDistribution", {
       defaultBehavior: {
-        origin: new S3Origin(this.bucket),
+        origin: S3BucketOrigin.withOriginAccessControl(this.bucket),
         viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: AllowedMethods.ALLOW_GET_HEAD,
         cachePolicy: undefined, // Custom cache policy can be added
@@ -156,5 +155,13 @@ export class SpaCFRoute53 extends Construct {
     Tags.of(this.distribution).add("ResourcePrefix", props.siteName);
     Tags.of(this.logsBucket).add("App", props.siteName);
     Tags.of(this.logsBucket).add("ResourcePrefix", props.siteName);
+
+    // CloudFormation outputs for created resources
+    new CfnOutput(this, "SpaBucketName", { value: this.bucket.bucketName });
+    new CfnOutput(this, "SpaLogsBucketName", { value: this.logsBucket.bucketName });
+    new CfnOutput(this, "SpaCertificateArn", { value: certificate.certificateArn });
+    new CfnOutput(this, "SpaDistributionId", { value: this.distribution.distributionId });
+    new CfnOutput(this, "SpaDistributionDomainName", { value: this.distribution.distributionDomainName });
+    new CfnOutput(this, "SpaAliasRecordName", { value: props.fqdn });
   }
 }
