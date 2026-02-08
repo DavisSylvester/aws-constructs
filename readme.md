@@ -145,4 +145,37 @@ When using this library it is a good practice to start with a new CDK project
   - `cdk deploy`
 
 
+# SpaCFRoute53 Construct
+
+The `SpaCFRoute53` construct provides a secure, production-ready pattern for hosting SPAs or static websites on S3, fronted by CloudFront, with DNS managed by Route53. It includes:
+- Private, versioned, encrypted S3 bucket with access logging
+- CloudFront distribution (TLS 1.3, GET/HEAD only, logging, SPA routing)
+- Route53 alias record for your custom domain
+- Centralized logs bucket (14-day retention)
+
+## Usage Example
+```typescript
+import { SpaCFRoute53 } from '@sylvesterllc/aws-constructs';
+import { SpaProps } from '@sylvesterllc/aws-constructs/src/interfaces/SpaProps';
+
+const spaProps: SpaProps = {
+  siteName: 'my-spa-app',
+  bucketName: 'my-spa-app-bucket-unique',
+  cloudfrontName: 'my-spa-app-cf',
+  domainName: 'example.com', // Root domain for Route53 zone lookup
+  fqdn: 'spa.example.com'    // Subdomain for the SPA
+};
+
+new SpaCFRoute53(this, 'SpaCFRoute53', spaProps);
+```
+
+## Deploying SPA Assets
+After building your SPA, upload the output to S3 using the AWS CLI:
+```sh
+aws s3 sync ./dist s3://my-spa-app-bucket-unique --delete
+```
+
+## More Details
+See [SpaCFRoute53-usage.md](./docs/SpaCFRoute53-usage.md) for full integration steps and [spa-cf-construct-plan.md](./docs/spa-cf-construct-plan.md) for design rationale and Well-Architected notes.
+
 Release Version : `1.0.28`

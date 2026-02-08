@@ -4,3 +4,4 @@ export { DynamoDbSingleTable } from "./DynamoDbSingleTable";
 export { TimerJob } from "./timer-job";
 export { BasicLambda } from "./BasicLambda";
 export * from "./basic-queue";
+export * from "./SpaCFRoute53";
