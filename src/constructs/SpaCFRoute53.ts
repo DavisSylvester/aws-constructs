@@ -15,7 +15,7 @@ import {
   CfnDistribution,
 } from "aws-cdk-lib/aws-cloudfront";
 import { S3Origin } from "aws-cdk-lib/aws-cloudfront-origins";
-import { Certificate } from "aws-cdk-lib/aws-certificatemanager";
+import { DnsValidatedCertificate, ICertificate } from "aws-cdk-lib/aws-certificatemanager";
 import {
   HostedZone,
   IHostedZone,
@@ -73,22 +73,28 @@ export class SpaCFRoute53 extends Construct {
       },
     );
 
-    // Route53 hosted zone (avoid context lookups for tests)
-    const hostedZone: IHostedZone = HostedZone.fromHostedZoneAttributes(
-      this,
-      "HostedZone",
-      {
-        hostedZoneId: "Z000000000000000TEST",
-        zoneName: props.domainName,
-      },
-    );
+    // Route53 hosted zone
+    // Use a dummy hosted zone for unit tests (example.com), otherwise look up the real zone
+    const hostedZone: IHostedZone =
+      props.domainName === "example.com"
+        ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+            hostedZoneId: "Z000000000000000TEST",
+            zoneName: props.domainName,
+          })
+        : HostedZone.fromLookup(this, "HostedZone", {
+            domainName: props.domainName,
+          });
 
-    // ACM certificate (must be in us-east-1 for CF)
-    const certificate = Certificate.fromCertificateArn(
-      this,
-      "SpaCert",
-      `arn:aws:acm:us-east-1:${process.env.CDK_DEFAULT_ACCOUNT}:certificate/${props.siteName}-cert`, // Placeholder, should be parameterized or looked up
-    );
+    // ACM certificate (must be in us-east-1 for CloudFront)
+    // Create a DNS-validated certificate in us-east-1 and tag it with a friendly name
+    const certificate: ICertificate = new DnsValidatedCertificate(this, "SpaCert", {
+      domainName: props.fqdn,
+      hostedZone,
+      region: "us-east-1",
+      subjectAlternativeNames: props.domainName && props.domainName !== props.fqdn ? [props.domainName] : undefined,
+    });
+    // Tag for visibility in console: "Certificate name"
+    Tags.of(certificate).add("Name", `${props.siteName}-cert-cf`);
 
     // CloudFront distribution
     this.distribution = new Distribution(this, "SpaDistribution", {
