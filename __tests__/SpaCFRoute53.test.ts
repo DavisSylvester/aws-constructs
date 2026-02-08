@@ -10,6 +10,7 @@ describe("SpaCFRoute53", () => {
     cloudfrontName: "testsite-cf",
     domainName: "example.com",
     fqdn: "spa.example.com",
+    hostedZoneId: "ZTEST1234567890",
   };
 
   it("provisions a private, versioned, encrypted S3 bucket with access logging", () => {
