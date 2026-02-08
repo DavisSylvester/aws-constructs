@@ -8,9 +8,9 @@ Ensure you have the following in your `package.json`:
 - `aws-cdk-lib`
 - `constructs`
 
-Install if needed:
+Install if needed (using Bun):
 ```sh
-pnpm add aws-cdk-lib constructs
+bun add aws-cdk-lib constructs
 ```
 
 ## 2. Import the Construct

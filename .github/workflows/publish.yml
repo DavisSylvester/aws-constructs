@@ -16,38 +16,32 @@ jobs:
       id-token: write # for provenance (optional)
     steps:
       - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v3
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
         with:
-          version: 10
+          bun-version: latest
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: "24.x"
-          cache: "pnpm"
+          # Note: actions/setup-node does not support bun caching
       - name: Configure .npmrc for npm registry
         run: |
           cat > ~/.npmrc << EOF
           //registry.npmjs.org/:_authToken=${{ secrets.NPM_REGISTRY_TOKEN }}
           registry=https://registry.npmjs.org/
           EOF
-      - name: Install dependencies
-        run: |
-          if [ -f pnpm-lock.yaml ]; then
-            echo "Found pnpm-lock.yaml; using --frozen-lockfile"
-            pnpm install --frozen-lockfile
-          else
-            echo "No pnpm-lock.yaml present; performing regular install"
-            pnpm install
-          fi
+      - name: Install dependencies (bun)
+        run: bun install
       - name: Verify npm auth & scope
         run: |
           npm whoami || { echo 'Not authenticated'; exit 1; }
           npm ping
           echo "Publishing package version $(jq -r '.version' package.json)"
       - name: Run tests
-        run: pnpm test -- --passWithNoTests
+        run: bun run test -- --passWithNoTests
       - name: Build
-        run: pnpm build
+        run: bun run build
       - name: Guard against duplicate version
         run: |
           V=$(jq -r '.version' package.json)
