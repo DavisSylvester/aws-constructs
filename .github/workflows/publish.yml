@@ -18,11 +18,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
         with:
-          version: 9
+          version: 10
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "22.x"
+          node-version: "24.x"
           cache: "pnpm"
       - name: Configure .npmrc for npm registry
         run: |
