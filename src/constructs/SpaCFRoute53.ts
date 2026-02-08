@@ -74,11 +74,17 @@ export class SpaCFRoute53 extends Construct {
     );
 
     // Route53 hosted zone
-    // Use a dummy hosted zone for unit tests (example.com), otherwise look up the real zone
+    // Prefer direct import when a hostedZoneId is provided; use a dummy hosted zone for tests;
+    // otherwise perform a lookup in the current account.
     const hostedZone: IHostedZone =
       props.domainName === "example.com"
         ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
             hostedZoneId: "Z000000000000000TEST",
+            zoneName: props.domainName,
+          })
+        : props.hostedZoneId
+        ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
+            hostedZoneId: props.hostedZoneId,
             zoneName: props.domainName,
           })
         : HostedZone.fromLookup(this, "HostedZone", {
