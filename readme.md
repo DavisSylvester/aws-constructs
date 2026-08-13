@@ -17,8 +17,7 @@ And more...
 
 1. Install the npm package:
 
-    `npm install @davissylvester/bishop-cdk-constructs --save`
-    - *ensure you have a `.npmrc` that uses the @sylvesterllc npm registry*
+    `npm install @davissylvester/aws-constructs --save`
 
 
 
@@ -37,7 +36,7 @@ The Microservice construct provides and easy way to get started with a basic Mic
 
 ### Usage
 ```typescript
-import { MicroService, MicroserviceProps } from '@davissylvester/bishop-cdk-constructs';
+import { MicroService, MicroserviceProps } from '@davissylvester/aws-constructs';
 
 new MicroService(this, 'microservice-test', microServiceProps);
 ```
@@ -133,7 +132,7 @@ When using this library it is a good practice to start with a new CDK project
    - `mkdir my-new-project`
    - `cd my-new-project`
    - `cdk init app --language typescript`
-   - `npm i @davissylvester/bishop-cdk-constructs`
+   - `npm i @davissylvester/aws-constructs`
    - `mkdir lambda-functions` (*holds all your lambda code*)
 
 # [Demo Project](https://github.com/davissylvester/bishop-cdk-constructs-demo.git)
@@ -155,8 +154,8 @@ The `SpaCFRoute53` construct provides a secure, production-ready pattern for hos
 
 ## Usage Example
 ```typescript
-import { SpaCFRoute53 } from '@sylvesterllc/aws-constructs';
-import { SpaProps } from '@sylvesterllc/aws-constructs/src/interfaces/SpaProps';
+import { SpaCFRoute53 } from '@davissylvester/aws-constructs';
+import { SpaProps } from '@davissylvester/aws-constructs/src/interfaces/SpaProps';
 
 const spaProps: SpaProps = {
   siteName: 'my-spa-app',
