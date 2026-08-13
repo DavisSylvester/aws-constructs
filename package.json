@@ -1,6 +1,6 @@
 {
-  "name": "@sylvesterllc/aws-constructs",
-  "version": "1.1.72",
+  "name": "@davissylvester/aws-constructs",
+  "version": "1.1.74",
   "description": "AWS Constructs",
   "main": "dist/index.js",
   "keywords": [
@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "npm run clean && tsc",
+    "prepare": "tsc",
     "build:layers": "cd ./src/resources/layers/common && pnpm i && tsc",
     "watch": "tsc -w",
     "test": "jest --passWithNoTests",

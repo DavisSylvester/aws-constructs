@@ -5,4 +5,7 @@ export interface SpaProps {
   domainName: string; // Root domain for Route53 zone lookup (e.g., example.com)
   fqdn: string; // Fully qualified domain name to serve the site (e.g., app.example.com)
   hostedZoneId?: string; // Optional: provide Hosted Zone ID to import zone directly
+  certificateArn?: string; // Optional: import this cert instead of creating one (must be us-east-1)
+  createDnsRecord?: boolean; // Optional: default true; false skips the Route53 alias records
+  logsBucketName?: string; // Optional: physical name for the access/CloudFront logs bucket
 }

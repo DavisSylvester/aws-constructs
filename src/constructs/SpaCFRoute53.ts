@@ -20,6 +20,7 @@ import {
   HostedZone,
   IHostedZone,
   ARecord,
+  AaaaRecord,
   RecordTarget,
 } from "aws-cdk-lib/aws-route53";
 import { CloudFrontTarget } from "aws-cdk-lib/aws-route53-targets";
@@ -44,6 +45,7 @@ export class SpaCFRoute53 extends Construct {
       this,
       `${props.domainName?.toLowerCase()}-spa-bucket-log`,
       {
+        ...(props.logsBucketName ? { bucketName: props.logsBucketName } : {}),
         removalPolicy: RemovalPolicy.DESTROY,
         autoDeleteObjects: true,
         lifecycleRules: [{ expiration: Duration.days(14) }],
@@ -72,11 +74,15 @@ export class SpaCFRoute53 extends Construct {
       },
     );
 
-    // Route53 hosted zone
-    // Prefer direct import when a hostedZoneId is provided; use a dummy hosted zone for tests;
-    // otherwise perform a lookup in the current account.
-    const hostedZone: IHostedZone =
-      props.hostedZoneId
+    // Whether the Route53 zone is needed at all. A caller that imports a cert AND
+    // skips the alias records has no use for a zone — and in that configuration a
+    // fromLookup() would fail, since the whole point is DNS held outside Route53.
+    const createDnsRecord: boolean = props.createDnsRecord ?? true;
+    const needsHostedZone: boolean = createDnsRecord || props.certificateArn === undefined;
+
+    let hostedZone: IHostedZone | undefined;
+    if (needsHostedZone) {
+      hostedZone = props.hostedZoneId
         ? HostedZone.fromHostedZoneAttributes(this, "HostedZone", {
             hostedZoneId: props.hostedZoneId,
             zoneName: props.domainName,
@@ -84,18 +90,32 @@ export class SpaCFRoute53 extends Construct {
         : HostedZone.fromLookup(this, "HostedZone", {
             domainName: props.domainName,
           });
+    }
 
-    // ACM certificate (must be in us-east-1 for CloudFront)
-    // Create a DNS-validated certificate in us-east-1 and tag it with a friendly name
-    const certificate: ICertificate = new Certificate(this, "SpaCert", {
-      domainName: props.domainName,
-      subjectAlternativeNames: [
-        props.fqdn,       
-      ],
+    // ACM certificate (must be in us-east-1 for CloudFront).
+    let certificate: ICertificate;
+    if (props.certificateArn) {
+      certificate = Certificate.fromCertificateArn(this, "SpaCert", props.certificateArn);
+    } else {
+      if (!hostedZone) {
+        throw new Error(
+          "SpaCFRoute53: a hosted zone is required to create a DNS-validated certificate. Pass certificateArn to import one instead.",
+        );
+      }
+      // A site on a delegated subdomain zone has fqdn === domainName. Passing the
+      // same name as both DomainName and a SAN yields duplicate
+      // DomainValidationOptions entries, which CloudFormation rejects.
+      const created = new Certificate(this, "SpaCert", {
+        domainName: props.domainName,
+        ...(props.fqdn === props.domainName
+          ? {}
+          : { subjectAlternativeNames: [props.fqdn] }),
         validation: CertificateValidation.fromDns(hostedZone),
-    });
-    // Tag for visibility in console: "Certificate name"
-    Tags.of(certificate).add("Name", `${props.siteName}-cert-cf`);
+      });
+      // Tag for visibility in console: "Certificate name"
+      Tags.of(created).add("Name", `${props.siteName}-cert-cf`);
+      certificate = created;
+    }
 
     // CloudFront distribution
     this.distribution = new Distribution(this, "SpaDistribution", {
@@ -141,12 +161,26 @@ export class SpaCFRoute53 extends Construct {
     this.distributionDomainName = this.distribution.distributionDomainName;
     this.distributionId = this.distribution.distributionId;
 
-    // Route53 alias record
-    new ARecord(this, "SpaAliasRecord", {
-      zone: hostedZone,
-      recordName: props.fqdn,
-      target: RecordTarget.fromAlias(new CloudFrontTarget(this.distribution)),
-    });
+    // Route53 alias records. AAAA as well as A: CloudFront is dual-stack, so an
+    // A-only zone is unreachable from IPv6-only clients.
+    if (createDnsRecord) {
+      if (!hostedZone) {
+        throw new Error(
+          "SpaCFRoute53: createDnsRecord requires a hosted zone. Provide hostedZoneId, or pass createDnsRecord: false.",
+        );
+      }
+      const aliasTarget = RecordTarget.fromAlias(new CloudFrontTarget(this.distribution));
+      new ARecord(this, "SpaAliasRecord", {
+        zone: hostedZone,
+        recordName: props.fqdn,
+        target: aliasTarget,
+      });
+      new AaaaRecord(this, "SpaAliasRecordAaaa", {
+        zone: hostedZone,
+        recordName: props.fqdn,
+        target: aliasTarget,
+      });
+    }
 
     // Tagging
     Tags.of(this.bucket).add("App", props.siteName);
@@ -162,6 +196,8 @@ export class SpaCFRoute53 extends Construct {
     new CfnOutput(this, "SpaCertificateArn", { value: certificate.certificateArn });
     new CfnOutput(this, "SpaDistributionId", { value: this.distribution.distributionId });
     new CfnOutput(this, "SpaDistributionDomainName", { value: this.distribution.distributionDomainName });
-    new CfnOutput(this, "SpaAliasRecordName", { value: props.fqdn });
+    if (createDnsRecord) {
+      new CfnOutput(this, "SpaAliasRecordName", { value: props.fqdn });
+    }
   }
 }

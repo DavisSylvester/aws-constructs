@@ -16,8 +16,8 @@ bun add aws-cdk-lib constructs
 ## 2. Import the Construct
 
 ```ts
-import { SpaCFRoute53 } from "@sylvesterllc/aws-constructs";
-import { SpaProps } from "@sylvesterllc/aws-constructs/src/interfaces/SpaProps";
+import { SpaCFRoute53 } from "@davissylvester/aws-constructs";
+import { SpaProps } from "@davissylvester/aws-constructs/src/interfaces/SpaProps";
 ```
 
 ## 3. Example Stack Usage
@@ -25,8 +25,8 @@ import { SpaProps } from "@sylvesterllc/aws-constructs/src/interfaces/SpaProps";
 ```ts
 import { Stack, StackProps } from "aws-cdk-lib";
 import { Construct } from "constructs";
-import { SpaCFRoute53 } from "@sylvesterllc/aws-constructs";
-import { SpaProps } from "@sylvesterllc/aws-constructs/src/interfaces/SpaProps";
+import { SpaCFRoute53 } from "@davissylvester/aws-constructs";
+import { SpaProps } from "@davissylvester/aws-constructs/src/interfaces/SpaProps";
 
 export class MySpaStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {

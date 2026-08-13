@@ -1,7 +1,7 @@
 import { App, Stack } from "aws-cdk-lib";
 import { SpaCFRoute53 } from "../src/constructs/SpaCFRoute53";
 import { SpaProps } from "../src/interfaces/SpaProps";
-import { Template } from "aws-cdk-lib/assertions";
+import { Match, Template } from "aws-cdk-lib/assertions";
 
 describe("SpaCFRoute53", () => {
   const props: SpaProps = {
@@ -76,6 +76,71 @@ describe("SpaCFRoute53", () => {
           },
         ],
       },
+    });
+  });
+
+  it("omits subjectAlternativeNames when fqdn equals domainName", () => {
+    const app = new App();
+    const stack = new Stack(app, "TestStack");
+    new SpaCFRoute53(stack, "SpaCFRoute53", {
+      ...props,
+      domainName: "admin.example.com",
+      fqdn: "admin.example.com",
+    });
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties("AWS::CertificateManager::Certificate", {
+      DomainName: "admin.example.com",
+      SubjectAlternativeNames: Match.absent(),
+    });
+  });
+
+  it("still requests the fqdn as a SAN when it differs from domainName", () => {
+    const app = new App();
+    const stack = new Stack(app, "TestStack");
+    new SpaCFRoute53(stack, "SpaCFRoute53", props);
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties("AWS::CertificateManager::Certificate", {
+      DomainName: props.domainName,
+      SubjectAlternativeNames: [props.fqdn],
+    });
+  });
+
+  it("imports an existing certificate instead of creating one", () => {
+    const app = new App();
+    const stack = new Stack(app, "TestStack");
+    new SpaCFRoute53(stack, "SpaCFRoute53", {
+      ...props,
+      certificateArn:
+        "arn:aws:acm:us-east-1:111122223333:certificate/11111111-2222-3333-4444-555555555555",
+      createDnsRecord: false,
+      hostedZoneId: undefined,
+    });
+    const template = Template.fromStack(stack);
+    template.resourceCountIs("AWS::CertificateManager::Certificate", 0);
+    template.resourceCountIs("AWS::Route53::RecordSet", 0);
+  });
+
+  it("creates both A and AAAA alias records by default", () => {
+    const app = new App();
+    const stack = new Stack(app, "TestStack");
+    new SpaCFRoute53(stack, "SpaCFRoute53", props);
+    const template = Template.fromStack(stack);
+    template.resourceCountIs("AWS::Route53::RecordSet", 2);
+    template.hasResourceProperties("AWS::Route53::RecordSet", { Type: "A" });
+    template.hasResourceProperties("AWS::Route53::RecordSet", { Type: "AAAA" });
+  });
+
+  it("names the logs bucket when logsBucketName is provided", () => {
+    const app = new App();
+    const stack = new Stack(app, "TestStack");
+    new SpaCFRoute53(stack, "SpaCFRoute53", {
+      ...props,
+      logsBucketName: "testsite-logs-unique",
+    });
+    const template = Template.fromStack(stack);
+    template.hasResourceProperties("AWS::S3::Bucket", {
+      BucketName: "testsite-logs-unique",
+      LifecycleConfiguration: { Rules: [{ Status: "Enabled", ExpirationInDays: 14 }] },
     });
   });
 });
