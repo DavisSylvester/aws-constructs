@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "build": "npm run clean && tsc",
+    "prepare": "tsc",
     "build:layers": "cd ./src/resources/layers/common && pnpm i && tsc",
     "watch": "tsc -w",
     "test": "jest --passWithNoTests",
